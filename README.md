@@ -6,6 +6,10 @@
   항해 플러스 백엔드 5기 (19조).
 </p>
 
+## Projects
+
+프로젝트 일정은 <a href="https://github.com/users/boy672820/projects/4">Github Projects</a>에서 확인하실 수 있습니다.
+
 ## Description
 
 - `콘서트 예약 서비스`를 구현해 봅니다.
