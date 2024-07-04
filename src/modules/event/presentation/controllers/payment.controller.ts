@@ -5,10 +5,8 @@ import { PaymentResponse } from '../dto/responses';
 @Controller('payments')
 export class PaymentController {
   @Post()
-  pay(
-    user: { userId: string },
-    @Body() { reservationId }: { reservationId: string },
-  ): Promise<any> {
+  pay(@Body() body: any): Promise<any> {
+    body;
     return Promise.resolve(
       ResponseEntity.okWith(
         PaymentResponse.of({

@@ -6,10 +6,8 @@ import { ReservationResponse } from '../dto/responses';
 @Controller('reservations')
 export class ReservationController {
   @Post()
-  reserve(
-    user: { userId: string },
-    @Body() { seatId }: { seatId: string },
-  ): Promise<ResponseEntity<ReservationResponse>> {
+  reserve(@Body() body: any): Promise<ResponseEntity<ReservationResponse>> {
+    body;
     return Promise.resolve(
       ResponseEntity.okWith(
         ReservationResponse.of({
