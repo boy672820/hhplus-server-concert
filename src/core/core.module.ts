@@ -1,3 +1,4 @@
+import { DatabaseModule } from '@lib/database';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { validate } from './env.validator';
@@ -9,6 +10,7 @@ import { validate } from './env.validator';
       envFilePath: '.env',
       validate,
     }),
+    DatabaseModule,
   ],
 })
 export class CoreModule {}

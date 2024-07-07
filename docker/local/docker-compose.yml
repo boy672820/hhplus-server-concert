@@ -1,0 +1,16 @@
+version: '3.1'
+
+services:
+  db:
+    image: mysql
+    restart: always
+    ports:
+      - '${DATABASE_PORT}:3306'
+    volumes:
+      - ./data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123
+      MYSQL_DATABASE: concert
+      MYSQL_USER: concert
+      MYSQL_PASSWORD: 123
+      TZ: Asia/Seoul
