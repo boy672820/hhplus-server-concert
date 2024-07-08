@@ -678,7 +678,7 @@ HTTP/1.1 409 Conflict
 
 ## 좌석 예약
 
-### `POST /seats/:seatId/reservations`
+### `POST /reservations`
 
 좌석을 예약합니다.
 
@@ -686,9 +686,9 @@ HTTP/1.1 409 Conflict
 
 5분안에 결제를 완료하지 못할 경우, 예약은 취소되고 임시 할당은 해제됩니다.
 
-#### Parameters
+#### Request Body
 
-| Name     | Type     | Description                      |
+| Field     | Type     | Description                      |
 | -------- | -------- | -------------------------------- |
 | `seatId` | `string` | 예약할 좌석의 고유 식별자입니다. |
 
@@ -720,9 +720,14 @@ Authorization: Bearer {queueToken}
 #### Example Request
 
 ```http
-POST /seats/01J1XT311VHMZTE1WX3MYJV28S/reservations HTTP/1.1
+POST /reservations HTTP/1.1
 HOST: localhost:3000
 Authorization: Bearer {queueToken}
+Content-Type: application/json
+
+{
+  "seatId": "01J1XT311VHMZTE1WX3MYJV28S"
+}
 ```
 
 #### 201 Created
@@ -784,15 +789,15 @@ Content-Type: application/json
 
 ## 예약 결제
 
-### `POST /reservations/:reservationId/payments`
+### `POST /payments`
 
 예약 건을 결제합니다.
 
 결제가 끝나면 예약이 완료됩니다.
 
-#### Parameters
+#### Request Body
 
-| Name            | Type     | Description               |
+| Field            | Type     | Description               |
 | --------------- | -------- | ------------------------- |
 | `reservationId` | `string` | 예약의 고유 식별자입니다. |
 
@@ -815,9 +820,14 @@ Authorization: Bearer {userToken}
 #### Example Request
 
 ```http
-POST /reservations/01J1Y5GHE6RD7PN324EMV0YJEK/payments HTTP/1.1
+POST /payments HTTP/1.1
 HOST: localhost:3000
 Authorization: Bearer {userToken}
+Content-Type: application/json
+
+{
+  "reservationId": "01J1Y5GHE6RD7PN324EMV0YJEK"
+}
 ```
 
 #### 201 Created
