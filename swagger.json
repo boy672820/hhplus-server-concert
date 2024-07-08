@@ -1,0 +1,404 @@
+{
+  "openapi": "3.1.0",
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local Server"
+    }
+  ],
+  "info": {
+    "version": "0.0.1",
+    "title": "hhplus-server-concert",
+    "description": "",
+    "license": {
+      "name": "UNLICENSED"
+    }
+  },
+  "paths": {
+    "/events/{eventId}/schedules/available": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "parameters": [
+          {
+            "name": "eventId",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "description": "이벤트 ID",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ScheduleResponse[] 예약 가능한 날짜 목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseEntityArrayScheduleResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/schedules/{scheduleId}/seats": {
+      "get": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "scheduleId",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "description": "",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseEntityArraySeatResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/seats/{seatId}/reservations": {
+      "post": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "seatId",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "description": "",
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseEntityReservationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reservations/{reservationId}/payments": {
+      "post": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "reservationId",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "description": "",
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/point": {
+      "get": {
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseEntityPointResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/point/charge": {
+      "get": {
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseEntityPointResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ResponseEntityArrayScheduleResponse": {
+        "type": "object",
+        "properties": {
+          "_data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScheduleResponse"
+            }
+          },
+          "_message": {
+            "type": "string"
+          },
+          "_status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "_data",
+          "_message",
+          "_status"
+        ]
+      },
+      "ScheduleResponse": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "_date": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "_id",
+          "_date"
+        ]
+      },
+      "ResponseEntityArraySeatResponse": {
+        "type": "object",
+        "properties": {
+          "_data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeatResponse"
+            }
+          },
+          "_message": {
+            "type": "string"
+          },
+          "_status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "_data",
+          "_message",
+          "_status"
+        ]
+      },
+      "SeatResponse": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "_number": {
+            "type": "number"
+          },
+          "_status": {
+            "$ref": "#/components/schemas/SeatStatus"
+          }
+        },
+        "required": [
+          "_id",
+          "_number",
+          "_status"
+        ]
+      },
+      "SeatStatus": {
+        "oneOf": [
+          {
+            "const": "PENDING"
+          },
+          {
+            "const": "IN_PROGRESS"
+          },
+          {
+            "const": "COMPLETED"
+          }
+        ]
+      },
+      "ResponseEntityReservationResponse": {
+        "type": "object",
+        "properties": {
+          "_data": {
+            "$ref": "#/components/schemas/ReservationResponse"
+          },
+          "_message": {
+            "type": "string"
+          },
+          "_status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "_data",
+          "_message",
+          "_status"
+        ]
+      },
+      "ReservationResponse": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "_scheduleDate": {
+            "type": "string"
+          },
+          "_seatNumber": {
+            "type": "number"
+          },
+          "_status": {
+            "$ref": "#/components/schemas/ReservationStatus"
+          },
+          "_event": {
+            "$ref": "#/components/schemas/Event"
+          },
+          "_reservedDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "_expiredDate": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "_id",
+          "_scheduleDate",
+          "_seatNumber",
+          "_status",
+          "_event",
+          "_reservedDate",
+          "_expiredDate"
+        ]
+      },
+      "ReservationStatus": {
+        "oneOf": [
+          {
+            "const": "TEMP_ASSIGNED"
+          },
+          {
+            "const": "PAID"
+          }
+        ]
+      },
+      "Event": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "startDate": {
+            "type": "string"
+          },
+          "endDate": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "address",
+          "startDate",
+          "endDate"
+        ]
+      },
+      "ResponseEntityPointResponse": {
+        "type": "object",
+        "properties": {
+          "_data": {
+            "$ref": "#/components/schemas/PointResponse"
+          },
+          "_message": {
+            "type": "string"
+          },
+          "_status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "_data",
+          "_message",
+          "_status"
+        ]
+      },
+      "PointResponse": {
+        "type": "object",
+        "properties": {
+          "_balance": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "_balance"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "public",
+      "description": "Some description describing public group..."
+    }
+  ],
+  "x-samchon-emended": true
+}

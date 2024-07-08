@@ -789,7 +789,7 @@ Content-Type: application/json
 
 ## 예약 결제
 
-### `POST payments`
+### `POST /payments`
 
 예약 건을 결제합니다.
 
