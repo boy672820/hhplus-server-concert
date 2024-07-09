@@ -18,9 +18,12 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
+    "seed:run": "ts-node -r tsconfig-paths/register --project tsconfig.json ./node_modules/typeorm-extension/bin/cli.cjs seed:run -d typeorm/data-source.ts",
+    "seed:create": "ts-node ./node_modules/typeorm-extension/bin/cli.cjs seed:create",
     "prepare": "ts-patch install && typia patch"
   },
   "dependencies": {
+    "@js-joda/core": "^5.6.3",
     "@nestia/core": "^3.4.3",
     "@nestia/e2e": "^0.6.0",
     "@nestia/fetcher": "^3.4.3",
@@ -37,9 +40,11 @@
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "typeorm": "^0.3.20",
-    "typia": "^6.4.1"
+    "typia": "^6.4.1",
+    "ulid": "^2.3.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.4.1",
     "@nestia/sdk": "^3.4.3",
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
@@ -50,6 +55,7 @@
     "@types/supertest": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
+    "dotenv": "^16.4.5",
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
@@ -64,6 +70,7 @@
     "ts-node": "^10.9.2",
     "ts-patch": "^3.2.1",
     "tsconfig-paths": "^4.2.0",
+    "typeorm-extension": "^3.5.1",
     "typescript": "5.5.2"
   },
   "jest": {
