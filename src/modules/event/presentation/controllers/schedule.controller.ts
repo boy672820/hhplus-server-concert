@@ -1,16 +1,26 @@
-import { LocalDateTime, SeatStatus } from '@lib/types';
+import { LocalDateTime } from '@lib/types';
 import { LocalDateTimeTransformerPipe } from '@lib/pipes';
 import { ResponseEntity } from '@lib/response';
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ScheduleResponse, SeatResponse } from '../dto/responses';
-import { FindSchedulesBetweenUseCase } from '../../application/usecases';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  FindAvailableSeatsUseCase,
+  FindSchedulesBetweenUseCase,
+} from '../../application/usecases';
+import {
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @ApiTags('콘서트 일정')
 @Controller('schedules')
 export class ScheduleController {
   constructor(
     private readonly findSchedulesBetweenUseCase: FindSchedulesBetweenUseCase,
+    private readonly findAvailableSeatsUseCase: FindAvailableSeatsUseCase,
   ) {}
 
   @ApiOperation({
@@ -49,20 +59,27 @@ export class ScheduleController {
     return ResponseEntity.okWith(schedules.map(ScheduleResponse.fromModel));
   }
 
+  @ApiOperation({
+    summary: '예약가능 좌석 조회',
+    description: '스케줄의 예약 가능한 좌석을 조회합니다.',
+  })
+  @ApiParam({
+    name: 'scheduleId',
+    description: '스케줄 ID',
+    required: true,
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: '성공',
+    type: SeatResponse,
+    isArray: true,
+  })
   @Get(':scheduleId/seats')
-  findSeats(
+  async findAvailableSeats(
     @Param('scheduleId') scheduleId: string,
   ): Promise<ResponseEntity<SeatResponse[]>> {
-    return Promise.resolve(
-      ResponseEntity.okWith(
-        Array.from({ length: 10 }, (_, index) =>
-          SeatResponse.of({
-            id: index.toString(),
-            number: index + 1,
-            status: SeatStatus.Pending,
-          }),
-        ),
-      ),
-    );
+    const seats = await this.findAvailableSeatsUseCase.execute({ scheduleId });
+    return ResponseEntity.okWith(seats.map(SeatResponse.fromModel));
   }
 }

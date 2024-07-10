@@ -1,25 +1,35 @@
-import { LocalDateTime, SeatStatus } from '@lib/types';
+import { LocalDateTime } from '@lib/types';
 import { ResponseEntity } from '@lib/response';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { ScheduleController } from './schedule.controller';
 import { ScheduleResponse, SeatResponse } from '../dto/responses';
-import { FindSchedulesBetweenUseCase } from '../../application/usecases';
-import { Schedule } from '../../domain/models';
+import {
+  FindSchedulesBetweenUseCase,
+  FindAvailableSeatsUseCase,
+} from '../../application/usecases';
+import { Schedule, Seat } from '../../domain/models';
 
 const schedule = Schedule.create({
   startDate: LocalDateTime.now(),
   endDate: LocalDateTime.now(),
 });
+const seat = Seat.create({ eventId: '1', number: 1 });
 
 describe('ScheduleController', () => {
   let findSchedulesBetweenUseCase: MockProxy<FindSchedulesBetweenUseCase>;
+  let findAvailableSeatsUseCase: MockProxy<FindAvailableSeatsUseCase>;
   let controller: ScheduleController;
 
   beforeEach(() => {
     findSchedulesBetweenUseCase = mock<FindSchedulesBetweenUseCase>();
-    controller = new ScheduleController(findSchedulesBetweenUseCase);
+    findAvailableSeatsUseCase = mock<FindAvailableSeatsUseCase>();
+    controller = new ScheduleController(
+      findSchedulesBetweenUseCase,
+      findAvailableSeatsUseCase,
+    );
 
     findSchedulesBetweenUseCase.execute.mockResolvedValue([schedule]);
+    findAvailableSeatsUseCase.execute.mockResolvedValue([seat]);
   });
 
   it('스케줄 목록을 조회합니다.', async () => {
@@ -38,19 +48,11 @@ describe('ScheduleController', () => {
     const scheduleId = '1';
 
     // When
-    const result = await controller.findSeats(scheduleId);
+    const result = await controller.findAvailableSeats(scheduleId);
 
     // Then
     expect(result).toEqual(
-      ResponseEntity.okWith(
-        Array.from({ length: 10 }, (_, index) =>
-          SeatResponse.of({
-            id: index.toString(),
-            number: index + 1,
-            status: SeatStatus.Pending,
-          }),
-        ),
-      ),
+      ResponseEntity.okWith([SeatResponse.fromModel(seat)]),
     );
   });
 });
