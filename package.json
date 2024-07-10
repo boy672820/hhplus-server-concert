@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@js-joda/core": "^5.6.3",
+    "@js-joda/timezone": "^2.21.1",
     "@nestia/core": "^3.4.3",
     "@nestia/e2e": "^0.6.0",
     "@nestia/fetcher": "^3.4.3",
