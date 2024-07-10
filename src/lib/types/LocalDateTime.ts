@@ -4,7 +4,9 @@ import {
   LocalDate,
   LocalTime,
   nativeJs,
+  ZoneId,
 } from '@js-joda/core';
+import '@js-joda/timezone';
 
 export class LocalDateTime {
   constructor(private readonly value: JodaDateTime) {}
@@ -20,7 +22,8 @@ export class LocalDateTime {
   static fromDate = (value: Date): LocalDateTime =>
     new LocalDateTime(nativeJs(value).toLocalDateTime());
 
-  toDate = (): Date => convert(this.value).toDate();
+  toDate = (zoneId?: string): Date =>
+    convert(this.value, zoneId ? ZoneId.of(zoneId) : undefined).toDate();
 
   toString = (): string => this.value.toString();
 }

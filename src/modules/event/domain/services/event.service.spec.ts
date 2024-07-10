@@ -2,8 +2,8 @@ import { LocalDateTime } from '@lib/types';
 import { Test } from '@nestjs/testing';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { EventService } from './event.service';
-import { EventRepository } from '../repositories';
-import { Event } from '../models';
+import { EventRepository, ScheduleRepository } from '../repositories';
+import { Event, Schedule } from '../models';
 
 const event = Event.create({
   title: '이벤트1',
@@ -12,9 +12,15 @@ const event = Event.create({
   endDate: LocalDateTime.now(),
 });
 
+const schedule = Schedule.create({
+  startDate: LocalDateTime.now(),
+  endDate: LocalDateTime.now(),
+});
+
 describe('EventService', () => {
   let eventService: EventService;
   let eventRepository: MockProxy<EventRepository>;
+  let scheduleRepository: MockProxy<ScheduleRepository>;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -24,11 +30,18 @@ describe('EventService', () => {
           provide: EventRepository,
           useValue: mock<EventRepository>(),
         },
+        {
+          provide: ScheduleRepository,
+          useValue: mock<ScheduleRepository>(),
+        },
       ],
     }).compile();
 
     eventService = moduleRef.get(EventService);
     eventRepository = moduleRef.get(EventRepository);
+    scheduleRepository = moduleRef.get(ScheduleRepository);
+
+    scheduleRepository.findAvailables.mockResolvedValue([schedule]);
 
     eventRepository.findAll.mockResolvedValue([event]);
   });
@@ -38,6 +51,17 @@ describe('EventService', () => {
       const result = await eventService.findAll();
 
       expect(result).toEqual([event]);
+    });
+  });
+
+  describe('예약 가능한 날짜 조회', () => {
+    it('특정 콘서트의 예약 가능한 날짜를 조회합니다.', async () => {
+      const result = await eventService.findAvailableSchedules({
+        startDate: LocalDateTime.now(),
+        endDate: LocalDateTime.now(),
+      });
+
+      expect(result).toEqual([schedule]);
     });
   });
 });

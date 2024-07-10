@@ -1,4 +1,7 @@
 import { Type } from '@nestjs/common';
-import { FindEventsUseCase } from './usecases';
+import { FindEventsUseCase, FindSchedulesBetweenUseCase } from './usecases';
 
-export const useCases: Type<any>[] = [FindEventsUseCase];
+export const useCases: Type<any>[] = [
+  FindEventsUseCase,
+  FindSchedulesBetweenUseCase,
+];
