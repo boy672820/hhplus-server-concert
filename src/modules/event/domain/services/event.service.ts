@@ -1,13 +1,18 @@
 import { LocalDateTime } from '@lib/types';
 import { Injectable } from '@nestjs/common';
-import { EventRepository, ScheduleRepository } from '../repositories';
-import { Event, Schedule } from '../models';
+import {
+  EventRepository,
+  ScheduleRepository,
+  SeatRepository,
+} from '../repositories';
+import { Event, Schedule, Seat } from '../models';
 
 @Injectable()
 export class EventService {
   constructor(
     private readonly eventRepository: EventRepository,
     private readonly scheduleRepository: ScheduleRepository,
+    private readonly seatRepository: SeatRepository,
   ) {}
 
   async findAll(): Promise<Event[]> {
@@ -23,5 +28,16 @@ export class EventService {
     endDate: LocalDateTime;
   }): Promise<Schedule[]> {
     return this.scheduleRepository.findBetween({ startDate, endDate });
+  }
+
+  async findAvailableSeats(scheduleId: string): Promise<Seat[]> {
+    const schedule = await this.scheduleRepository.findById(scheduleId);
+
+    if (!schedule) {
+      throw new Error('스케줄을 찾을 수 없습니다.');
+    }
+
+    const seats = await this.seatRepository.findAvailables(schedule.id);
+    return seats;
   }
 }

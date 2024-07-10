@@ -8,4 +8,12 @@ export class ScheduleMapper {
       startDate: entity.startDate,
       endDate: entity.endDate,
     });
+
+  static toEntity(model: Schedule): ScheduleEntity {
+    const entity = new ScheduleEntity();
+    entity.id = model.id;
+    entity.startDate = model.startDate;
+    entity.endDate = model.endDate;
+    return entity;
+  }
 }

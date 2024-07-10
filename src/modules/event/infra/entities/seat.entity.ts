@@ -1,5 +1,5 @@
 import { SeatStatus } from '@lib/types';
-import { PrimaryUlid } from '@lib/decorators';
+import { ColumnUlid, PrimaryUlid } from '@lib/decorators';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { ScheduleEntity } from './schedule.entity';
 
@@ -7,6 +7,7 @@ interface Seat {
   id: string;
   number: number;
   status: SeatStatus;
+  eventId: string;
   schedule: ScheduleEntity;
 }
 
@@ -14,6 +15,9 @@ interface Seat {
 export class SeatEntity implements Seat {
   @PrimaryUlid()
   id: string;
+
+  @ColumnUlid()
+  eventId: string;
 
   @Column({ type: 'int', nullable: false })
   number: number;

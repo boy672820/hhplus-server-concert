@@ -11,6 +11,13 @@ import { ScheduleMapper } from '../mappers/schedule.mapper';
 export class ScheduleRepositoryImpl implements ScheduleRepository {
   constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
 
+  async findById(id: string): Promise<Schedule | null> {
+    const schedule = await this.dataSource.manager.findOneBy(ScheduleEntity, {
+      id,
+    });
+    return schedule ? ScheduleMapper.toModel(schedule) : null;
+  }
+
   async findBetween({
     startDate,
     endDate,
