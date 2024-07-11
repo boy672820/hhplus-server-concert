@@ -26,4 +26,7 @@ export class LocalDateTime {
     convert(this.value, zoneId ? ZoneId.of(zoneId) : undefined).toDate();
 
   toString = (): string => this.value.toString();
+
+  plusMinutes = (minutes: number): LocalDateTime =>
+    new LocalDateTime(this.value.plusMinutes(minutes));
 }
