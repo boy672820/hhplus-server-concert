@@ -5,6 +5,7 @@ import { ulid } from 'ulid';
 import { EventEntity } from '../../src/modules/event/infra/entities/event.entity';
 import { ScheduleEntity } from '../../src/modules/event/infra/entities/schedule.entity';
 import { SeatEntity } from '../../src/modules/event/infra/entities/seat.entity';
+import Decimal from 'decimal.js';
 
 const now = LocalDateTime.now();
 const localDate = LocalDate.now();
@@ -62,11 +63,17 @@ const createSchedule = (
     event: event,
   });
 
-const createSeat = (schedule: ScheduleEntity, number: number): SeatEntity =>
+const createSeat = (
+  schedule: ScheduleEntity,
+  number: number,
+  price: Decimal,
+): SeatEntity =>
   SeatEntity.of({
     id: ulid(),
+    eventId: schedule.event.id,
     number,
     schedule,
+    price,
   });
 
 export const events: EventEntity[] = Array.from({ length: 5 }, () =>
@@ -78,5 +85,7 @@ export const schedules: ScheduleEntity[] = events.flatMap((event) =>
 );
 
 export const seats: SeatEntity[] = schedules.flatMap((schedule) =>
-  Array.from({ length: 10 }, (_, i) => createSeat(schedule, i + 1)),
+  Array.from({ length: 10 }, (_, i) =>
+    createSeat(schedule, i + 1, new Decimal(10000)),
+  ),
 );

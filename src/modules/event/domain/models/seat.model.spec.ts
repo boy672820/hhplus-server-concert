@@ -1,6 +1,7 @@
-import { SeatStatus } from '@lib/types';
+import { LocalDateTime, SeatStatus } from '@lib/types';
 import { DomainError } from '@lib/errors';
 import { Seat } from './seat.model';
+import Decimal from 'decimal.js';
 
 describe('Seat', () => {
   let seat: Seat;
@@ -11,6 +12,10 @@ describe('Seat', () => {
       eventId: '1',
       number: 1,
       status: SeatStatus.Pending,
+      price: new Decimal(10000),
+      scheduleId: '1',
+      scheduleStartDate: LocalDateTime.now(),
+      scheduleEndDate: LocalDateTime.now(),
     });
   });
 

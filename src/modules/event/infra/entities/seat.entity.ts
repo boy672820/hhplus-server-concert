@@ -1,6 +1,7 @@
 import { SeatStatus } from '@lib/types';
-import { ColumnUlid, PrimaryUlid } from '@lib/decorators';
+import { ColumnMoney, ColumnUlid, PrimaryUlid } from '@lib/decorators';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import Decimal from 'decimal.js';
 import { ScheduleEntity } from './schedule.entity';
 
 interface Seat {
@@ -9,6 +10,7 @@ interface Seat {
   status: SeatStatus;
   eventId: string;
   schedule: ScheduleEntity;
+  price: Decimal;
 }
 
 @Entity('seat')
@@ -25,11 +27,20 @@ export class SeatEntity implements Seat {
   @Column({ type: 'enum', enum: SeatStatus, default: SeatStatus.Pending })
   status: SeatStatus;
 
-  @ManyToOne(() => ScheduleEntity, { nullable: false, cascade: true })
+  @ColumnMoney()
+  price: Decimal;
+
+  @ManyToOne(() => ScheduleEntity, {
+    nullable: false,
+    cascade: true,
+    eager: true,
+  })
   @JoinColumn({ name: 'scheduleId' })
   schedule: ScheduleEntity;
 
-  static of(props: Pick<Seat, 'id' | 'number' | 'schedule'>): SeatEntity {
+  static of(
+    props: Pick<Seat, 'id' | 'eventId' | 'number' | 'schedule' | 'price'>,
+  ): SeatEntity {
     const entity = new SeatEntity();
     Object.assign(entity, props);
     entity.status = SeatStatus.Pending;

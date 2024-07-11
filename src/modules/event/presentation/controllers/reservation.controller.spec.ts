@@ -1,13 +1,35 @@
-import { ReservationStatus } from '@lib/types';
+import { LocalDateTime } from '@lib/types';
 import { ResponseEntity } from '@lib/response';
+import { mock, MockProxy } from 'jest-mock-extended';
 import { ReservationResponse } from '../dto/responses';
 import { ReservationController } from './reservation.controller';
+import { ReserveUseCase } from '../../application/usecases';
+import { Reservation } from '../../domain/models';
+import Decimal from 'decimal.js';
+
+const reservation = Reservation.create({
+  userId: '1',
+  eventId: '1',
+  seatId: '1',
+  eventTitle: 'title',
+  eventAddress: 'address',
+  eventStartDate: LocalDateTime.now(),
+  eventEndDate: LocalDateTime.now(),
+  seatNumber: 1,
+  price: new Decimal(10000),
+  scheduleStartDate: LocalDateTime.now(),
+  scheduleEndDate: LocalDateTime.now(),
+});
 
 describe('ReservationController', () => {
+  let reserveUseCase: MockProxy<ReserveUseCase>;
   let controller: ReservationController;
 
   beforeEach(() => {
-    controller = new ReservationController();
+    reserveUseCase = mock<ReserveUseCase>();
+    controller = new ReservationController(reserveUseCase);
+
+    reserveUseCase.execute.mockResolvedValue(reservation);
   });
 
   it('좌석을 예약합니다.', async () => {
@@ -20,23 +42,7 @@ describe('ReservationController', () => {
 
     // Then
     expect(result).toEqual(
-      ResponseEntity.okWith(
-        ReservationResponse.of({
-          id: '1',
-          scheduleDate: '2024-08-01',
-          seatNumber: 1,
-          status: ReservationStatus.TempAssigned,
-          event: {
-            id: '1',
-            title: '행사',
-            address: '서울',
-            startDate: '2024-08-01',
-            endDate: '2024-08-31',
-          },
-          reservedDate: expect.any(Date),
-          expiredDate: expect.any(Date),
-        }),
-      ),
+      ResponseEntity.okWith(ReservationResponse.fromModel(reservation)),
     );
   });
 });
