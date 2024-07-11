@@ -1,8 +1,10 @@
+import { LocalDateTime } from '@lib/types';
 import { DomainError } from '@lib/errors';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { Seat } from '../models';
 import { SeatRepository } from '../repositories';
 import { SeatService } from './seat.service';
+import Decimal from 'decimal.js';
 
 describe('SeatService', () => {
   let seat: Seat;
@@ -10,7 +12,14 @@ describe('SeatService', () => {
   let service: SeatService;
 
   beforeEach(() => {
-    seat = Seat.create({ eventId: '1', number: 1 });
+    seat = Seat.create({
+      eventId: '1',
+      number: 1,
+      price: new Decimal(10000),
+      scheduleId: '1',
+      scheduleStartDate: LocalDateTime.now(),
+      scheduleEndDate: LocalDateTime.now(),
+    });
     seatRepository = mock<SeatRepository>();
     service = new SeatService(seatRepository);
 

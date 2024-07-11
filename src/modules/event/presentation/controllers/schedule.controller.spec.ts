@@ -8,12 +8,20 @@ import {
   FindAvailableSeatsUseCase,
 } from '../../application/usecases';
 import { Schedule, Seat } from '../../domain/models';
+import Decimal from 'decimal.js';
 
 const schedule = Schedule.create({
   startDate: LocalDateTime.now(),
   endDate: LocalDateTime.now(),
 });
-const seat = Seat.create({ eventId: '1', number: 1 });
+const seat = Seat.create({
+  eventId: '1',
+  number: 1,
+  price: new Decimal(10000),
+  scheduleId: '1',
+  scheduleStartDate: LocalDateTime.now(),
+  scheduleEndDate: LocalDateTime.now(),
+});
 
 describe('ScheduleController', () => {
   let findSchedulesBetweenUseCase: MockProxy<FindSchedulesBetweenUseCase>;

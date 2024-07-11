@@ -5,6 +5,7 @@ import { EventService } from './event.service';
 import { EventRepository, ScheduleRepository } from '../repositories';
 import { Event, Schedule, Seat } from '../models';
 import { SeatRepository } from '../repositories/seat.repository';
+import Decimal from 'decimal.js';
 
 const event = Event.create({
   title: '이벤트1',
@@ -16,7 +17,14 @@ const schedule = Schedule.create({
   startDate: LocalDateTime.now(),
   endDate: LocalDateTime.now(),
 });
-const seat = Seat.create({ eventId: '1', number: 1 });
+const seat = Seat.create({
+  eventId: '1',
+  number: 1,
+  price: new Decimal(10000),
+  scheduleId: '1',
+  scheduleStartDate: LocalDateTime.now(),
+  scheduleEndDate: LocalDateTime.now(),
+});
 
 describe('EventService', () => {
   let eventService: EventService;
