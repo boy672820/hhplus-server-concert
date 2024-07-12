@@ -4,6 +4,7 @@ import {
   FindSchedulesBetweenUseCase,
   FindAvailableSeatsUseCase,
   ReserveUseCase,
+  PayReservationUseCase,
 } from './usecases';
 
 export const useCases: Type<any>[] = [
@@ -11,4 +12,5 @@ export const useCases: Type<any>[] = [
   FindSchedulesBetweenUseCase,
   FindAvailableSeatsUseCase,
   ReserveUseCase,
+  PayReservationUseCase,
 ];

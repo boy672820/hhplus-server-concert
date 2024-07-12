@@ -51,4 +51,12 @@ export class Seat implements SeatProps {
 
     this.status = SeatStatus.InProgress;
   };
+
+  pay(): void {
+    if (this.status === SeatStatus.Completed) {
+      throw DomainError.conflict('이미 결제된 좌석입니다.');
+    }
+
+    this.status = SeatStatus.Completed;
+  }
 }

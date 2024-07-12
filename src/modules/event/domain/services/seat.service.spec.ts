@@ -47,4 +47,25 @@ describe('SeatService', () => {
       });
     });
   });
+
+  describe('좌석 결제', () => {
+    it('좌석을 결제합니다.', async () => {
+      const seatId = '1';
+
+      const result = await service.pay({ seatId });
+
+      expect(result).toEqual(seat);
+    });
+
+    describe('좌석 결제에 실패하는 경우', () => {
+      it('좌석을 찾을 수 없습니다.', async () => {
+        const seatId = '2';
+        seatRepository.findById.mockResolvedValueOnce(null);
+
+        await expect(service.pay({ seatId })).rejects.toThrow(
+          DomainError.notFound('좌석을 찾을 수 없습니다.'),
+        );
+      });
+    });
+  });
 });

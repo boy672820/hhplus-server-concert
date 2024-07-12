@@ -1,4 +1,5 @@
 import { LocalDateTime, ReservationStatus } from '@lib/types';
+import { DomainError } from '@lib/errors';
 import Decimal from 'decimal.js';
 import { ulid } from 'ulid';
 
@@ -69,4 +70,16 @@ export class Reservation implements Props {
     });
 
   static from = (props: Props): Reservation => new Reservation(props);
+
+  pay(userId: string): void {
+    if (this.status === ReservationStatus.Paid) {
+      throw DomainError.conflict('이미 결제된 예약입니다.');
+    }
+
+    if (this.userId !== userId) {
+      throw DomainError.forbidden('다른 사용자의 예약은 결제할 수 없습니다.');
+    }
+
+    this.status = ReservationStatus.Paid;
+  }
 }
