@@ -1,8 +1,8 @@
 import { LocalDateTime } from '@lib/types';
+import { DomainError } from '@lib/errors';
 import { Injectable } from '@nestjs/common';
 import { Reservation } from '../models';
 import { EventRepository, ReservationRepository } from '../repositories';
-import { DomainError } from '../../../../lib/errors';
 import Decimal from 'decimal.js';
 
 @Injectable()
@@ -49,6 +49,27 @@ export class ReservationService {
       scheduleEndDate,
     });
     await this.reservationRepository.save(reservation);
+    return reservation;
+  }
+
+  async pay({
+    userId,
+    reservationId,
+  }: {
+    userId: string;
+    reservationId: string;
+  }): Promise<Reservation> {
+    const reservation =
+      await this.reservationRepository.findById(reservationId);
+
+    if (!reservation) {
+      throw DomainError.notFound('예약을 찾을 수 없습니다.');
+    }
+
+    reservation.pay(userId);
+
+    await this.reservationRepository.save(reservation);
+
     return reservation;
   }
 }

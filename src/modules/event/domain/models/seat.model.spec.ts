@@ -36,4 +36,22 @@ describe('Seat', () => {
       });
     });
   });
+
+  describe('좌석 결제', () => {
+    it('좌석의 임시할당을 해제합니다.', () => {
+      seat.pay();
+
+      expect(seat.status).toBe(SeatStatus.Completed);
+    });
+
+    describe('결제 실패', () => {
+      it('이미 결제된 좌석입니다.', () => {
+        seat.pay();
+
+        expect(() => seat.pay()).toThrow(
+          DomainError.conflict('이미 결제된 좌석입니다.'),
+        );
+      });
+    });
+  });
 });

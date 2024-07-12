@@ -20,4 +20,18 @@ export class SeatService {
 
     return seat;
   }
+
+  async pay({ seatId }: { seatId: string }): Promise<Seat> {
+    const seat = await this.seatRepository.findById(seatId);
+
+    if (!seat) {
+      throw DomainError.notFound('좌석을 찾을 수 없습니다.');
+    }
+
+    seat.pay();
+
+    await this.seatRepository.save(seat);
+
+    return seat;
+  }
 }
