@@ -294,6 +294,10 @@ Reservation |o--o| Payment : payments
 
 # API Spec
 
+## Open API (Swagger)
+
+![swagger](./swagger.png)
+
 **목차**
 
  - [예약가능 날짜 조회](#예약가능-날짜-조회)
