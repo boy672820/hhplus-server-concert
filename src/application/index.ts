@@ -6,6 +6,7 @@ import {
   GenerateTokenUsecase,
   PayReservationUseCase,
   ReserveUseCase,
+  ValidateQueueUseCase,
 } from './usecases';
 
 export const usecases: Type<any>[] = [
@@ -15,4 +16,5 @@ export const usecases: Type<any>[] = [
   FindAvailableSeatsUseCase,
   ReserveUseCase,
   PayReservationUseCase,
+  ValidateQueueUseCase,
 ];
