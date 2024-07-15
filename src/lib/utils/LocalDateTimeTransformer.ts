@@ -6,7 +6,7 @@ export class LocalDateTimeTransformer implements ValueTransformer {
     if (!value) {
       return value;
     }
-    const date = value.toDate('UTC');
+    const date = value.toDate('Asia/Seoul');
     return date;
   }
 

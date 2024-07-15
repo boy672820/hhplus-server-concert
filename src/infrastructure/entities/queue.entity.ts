@@ -1,6 +1,6 @@
 import { LocalDateTime } from '@lib/types';
 import { ColumnDatetime, ColumnUlid } from '@lib/decorators';
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, Index } from 'typeorm';
 
 export interface Queue {
   sequence: number;
@@ -15,6 +15,7 @@ export class QueueEntity implements Queue {
   sequence: number;
 
   @ColumnUlid()
+  @Index()
   userId: string;
 
   @Column({ type: 'bool', default: false })
