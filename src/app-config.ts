@@ -22,3 +22,10 @@ export const validationPipeOptions: ValidationPipeOptions = {
 export const classSerializerOptions: ClassSerializerInterceptorOptions = {
   excludeExtraneousValues: true,
 };
+
+/**
+ * Swagger 설정
+ */
+export const swagger = {
+  title: '콘서트 예약 서비스',
+};

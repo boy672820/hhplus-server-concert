@@ -1,32 +1,34 @@
+import { LocalDateTime } from '@lib/types';
 import { ResponseEntity } from '@lib/response';
 import { EventController } from './event.controller';
-import { ScheduleResponse } from '../dto/responses';
+import { EventResponse } from '../dto/responses';
+import { mock, MockProxy } from 'jest-mock-extended';
+import { FindEventsUseCase } from '../../application/usecases';
+import { Event } from '../../domain/models';
+
+const event = Event.create({
+  title: 'title',
+  address: 'address',
+  startDate: LocalDateTime.now(),
+  endDate: LocalDateTime.now(),
+});
 
 describe('EventController', () => {
+  let findEventsUseCase: MockProxy<FindEventsUseCase>;
   let controller: EventController;
 
   beforeEach(() => {
-    controller = new EventController();
+    findEventsUseCase = mock<FindEventsUseCase>();
+    controller = new EventController(findEventsUseCase);
+
+    findEventsUseCase.execute.mockResolvedValue([event]);
   });
 
-  it('예약 가능한 날짜를 조회합니다.', async () => {
-    // Given
-    const eventId = '1';
+  it('이벤트 목록을 조회합니다.', async () => {
+    const result = await controller.findAll();
 
-    // When
-    const result = await controller.findAvailableSchedules(eventId);
-
-    // Then
     expect(result).toEqual(
-      ResponseEntity.okWith(
-        [
-          { id: '1', date: '2024-08-01' },
-          { id: '2', date: '2024-08-02' },
-          { id: '3', date: '2024-08-03' },
-          { id: '4', date: '2024-08-04' },
-          { id: '5', date: '2024-08-05' },
-        ].map(ScheduleResponse.of),
-      ),
+      ResponseEntity.okWith([EventResponse.fromModel(event)]),
     );
   });
 });

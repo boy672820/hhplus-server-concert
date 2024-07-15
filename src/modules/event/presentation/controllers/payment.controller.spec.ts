@@ -1,12 +1,25 @@
 import { ResponseEntity } from '@lib/response';
+import { mock, MockProxy } from 'jest-mock-extended';
 import { PaymentController } from './payment.controller';
 import { PaymentResponse } from '../dto/responses';
+import { PayReservationUseCase } from '../../application/usecases';
+import { Payment } from '../../domain/models';
+import Decimal from 'decimal.js';
+
+const payment = Payment.create({
+  reservationId: '1',
+  amount: new Decimal(100),
+});
 
 describe('PaymentController', () => {
+  let payReservationUseCase: MockProxy<PayReservationUseCase>;
   let controller: PaymentController;
 
   beforeEach(() => {
-    controller = new PaymentController();
+    payReservationUseCase = mock<PayReservationUseCase>();
+    controller = new PaymentController(payReservationUseCase);
+
+    payReservationUseCase.execute.mockResolvedValue(payment);
   });
 
   it('예약된 좌석을 결제합니다.', async () => {
@@ -19,13 +32,7 @@ describe('PaymentController', () => {
 
     // Then
     expect(result).toEqual(
-      ResponseEntity.okWith(
-        PaymentResponse.of({
-          reservationId: '1',
-          amount: '220000',
-          createdDate: expect.any(Date),
-        }),
-      ),
+      ResponseEntity.okWith(PaymentResponse.fromModel(payment)),
     );
   });
 });

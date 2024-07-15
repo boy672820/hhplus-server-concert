@@ -1,33 +1,36 @@
-import { ReservationStatus } from '@lib/types';
+import { AuthGuard } from '@lib/guards';
+import { User } from '@lib/decorators';
 import { ResponseEntity } from '@lib/response';
-import { Controller, Body, Post } from '@nestjs/common';
+import { Controller, Body, Post, UseGuards } from '@nestjs/common';
 import { ReservationResponse } from '../dto/responses';
+import { ReserveRequest } from '../dto/requests';
+import { ReserveUseCase } from '../../application/usecases';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('reservations')
 export class ReservationController {
+  constructor(private readonly reserveUseCase: ReserveUseCase) {}
+
+  @ApiOperation({
+    summary: '좌석 예약',
+    description: '좌석을 예약합니다.',
+  })
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: '좌석 예약 성공',
+    type: ReservationResponse,
+  })
+  @UseGuards(AuthGuard)
   @Post()
-  reserve(
-    user: { userId: string },
-    @Body() { seatId }: { seatId: string },
+  async reserve(
+    @User() user: { userId: string },
+    @Body() body: ReserveRequest,
   ): Promise<ResponseEntity<ReservationResponse>> {
-    return Promise.resolve(
-      ResponseEntity.okWith(
-        ReservationResponse.of({
-          id: '1',
-          scheduleDate: '2024-08-01',
-          seatNumber: 1,
-          status: ReservationStatus.TempAssigned,
-          event: {
-            id: '1',
-            title: '행사',
-            address: '서울',
-            startDate: '2024-08-01',
-            endDate: '2024-08-31',
-          },
-          reservedDate: new Date(),
-          expiredDate: new Date(),
-        }),
-      ),
-    );
+    const reservation = await this.reserveUseCase.execute({
+      userId: user.userId,
+      seatId: body.seatId,
+    });
+    return ResponseEntity.okWith(ReservationResponse.fromModel(reservation));
   }
 }

@@ -1,23 +1,27 @@
 import { ResponseEntity } from '@lib/response';
-import { Controller, Get, Param } from '@nestjs/common';
-import { ScheduleResponse } from '../dto/responses';
+import { Controller, Get } from '@nestjs/common';
+import { FindEventsUseCase } from '../../application/usecases';
+import { EventResponse } from '../dto/responses';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('콘서트')
 @Controller('events')
 export class EventController {
-  @Get(':eventId/schedules/available')
-  findAvailableSchedules(
-    @Param('eventId') eventId: string,
-  ): Promise<ResponseEntity<ScheduleResponse[]>> {
-    return Promise.resolve(
-      ResponseEntity.okWith(
-        [
-          { id: '1', date: '2024-08-01' },
-          { id: '2', date: '2024-08-02' },
-          { id: '3', date: '2024-08-03' },
-          { id: '4', date: '2024-08-04' },
-          { id: '5', date: '2024-08-05' },
-        ].map(ScheduleResponse.of),
-      ),
-    );
+  constructor(private readonly findEventsUseCase: FindEventsUseCase) {}
+
+  @ApiOperation({
+    summary: '이벤트 전체 조회',
+    description: '이벤트 전체를 조회합니다.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '이벤트 전체 조회 성공',
+    type: EventResponse,
+    isArray: true,
+  })
+  @Get()
+  async findAll(): Promise<ResponseEntity<EventResponse[]>> {
+    const events = await this.findEventsUseCase.execute();
+    return ResponseEntity.okWith(events.map(EventResponse.fromModel));
   }
 }
