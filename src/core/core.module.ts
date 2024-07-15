@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import { validate } from './env.validator';
-import { ApplicationErrorFilter } from './application-error.filter';
+import { DomainExceptionFilter } from './domain-exception.filter';
 
 @Module({
   imports: [
@@ -17,7 +17,7 @@ import { ApplicationErrorFilter } from './application-error.filter';
   providers: [
     {
       provide: APP_FILTER,
-      useClass: ApplicationErrorFilter,
+      useClass: DomainExceptionFilter,
     },
   ],
 })
