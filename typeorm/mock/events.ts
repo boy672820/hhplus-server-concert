@@ -2,10 +2,10 @@ import { LocalDateTime } from '../../src/lib/types';
 import { faker } from '@faker-js/faker';
 import { LocalDate, LocalTime } from '@js-joda/core';
 import { ulid } from 'ulid';
-import { EventEntity } from '../../src/modules/event/infra/entities/event.entity';
-import { ScheduleEntity } from '../../src/modules/event/infra/entities/schedule.entity';
-import { SeatEntity } from '../../src/modules/event/infra/entities/seat.entity';
 import Decimal from 'decimal.js';
+import { ScheduleEntity } from '../../src/infrastructure/entities/schedule.entity';
+import { SeatEntity } from '../../src/infrastructure/entities/seat.entity';
+import { EventEntity } from '../../src/infrastructure/entities/event.entity';
 
 const now = LocalDateTime.now();
 const localDate = LocalDate.now();
