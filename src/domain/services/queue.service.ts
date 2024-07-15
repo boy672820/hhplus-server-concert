@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { QueueRepository } from '../repositories';
 import { Queue } from '../models';
+import { DomainError } from '../../lib/errors';
 
 @Injectable()
 export class QueueService {
@@ -12,8 +13,25 @@ export class QueueService {
     return sequence;
   }
 
-  generateToken(queue: Queue): string {
-    return queue.generateToken();
+  sign(queue: Queue): string {
+    return queue.sign();
+  }
+
+  parse(token: string): Queue {
+    const queue = Queue.parse(token);
+    return queue;
+  }
+
+  async verify(queue: Queue): Promise<Queue> {
+    const user = await this.queueRepository.findByUserId(queue.userId);
+
+    if (!user) {
+      throw DomainError.notFound('사용자를 찾을 수 없습니다.');
+    }
+
+    user.checkAvailable();
+
+    return queue;
   }
 
   async expire(userId: string): Promise<Queue> {

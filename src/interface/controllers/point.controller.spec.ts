@@ -1,3 +1,4 @@
+import { LocalDateTime } from '@lib/types';
 import { ResponseEntity } from '@lib/response';
 import { MockProxy, mock } from 'jest-mock-extended';
 import Decimal from 'decimal.js';
@@ -9,7 +10,7 @@ import { PointResponse } from '../dto/responses';
 const point = Point.from({
   userId: '1',
   balance: new Decimal('100'),
-  updatedDate: new Date(),
+  updatedDate: LocalDateTime.now(),
 });
 
 describe('PointController', () => {

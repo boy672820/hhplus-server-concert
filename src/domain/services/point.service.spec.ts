@@ -1,3 +1,4 @@
+import { LocalDateTime } from '@lib/types';
 import { DomainError } from '@lib/errors';
 import { MockProxy, mock } from 'jest-mock-extended';
 import Decimal from 'decimal.js';
@@ -8,7 +9,7 @@ import { PointRepository } from '../repositories';
 const point = Point.from({
   userId: '1',
   balance: new Decimal(100),
-  updatedDate: new Date(),
+  updatedDate: LocalDateTime.now(),
 });
 
 describe('PointService', () => {
@@ -33,7 +34,7 @@ describe('PointService', () => {
       const expected = Point.from({
         userId,
         balance: new Decimal(100),
-        updatedDate: expect.any(Date),
+        updatedDate: expect.any(LocalDateTime),
       });
       expect(result).toEqual(expected);
     });
@@ -50,7 +51,7 @@ describe('PointService', () => {
       const expected = Point.from({
         userId,
         balance: new Decimal(0),
-        updatedDate: expect.any(Date),
+        updatedDate: expect.any(LocalDateTime),
       });
       expect(result).toEqual(expected);
     });
@@ -69,7 +70,7 @@ describe('PointService', () => {
       const expected = Point.from({
         userId,
         balance: new Decimal(200),
-        updatedDate: expect.any(Date),
+        updatedDate: expect.any(LocalDateTime),
       });
       expect(result).toEqual(expected);
       expect(pointRepository.save).toHaveBeenCalledWith(expected);
@@ -88,7 +89,7 @@ describe('PointService', () => {
       const expected = Point.from({
         userId,
         balance: new Decimal(100),
-        updatedDate: expect.any(Date),
+        updatedDate: expect.any(LocalDateTime),
       });
       expect(pointRepository.save).toHaveBeenCalledWith(expected);
     });

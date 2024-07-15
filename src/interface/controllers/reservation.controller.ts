@@ -1,4 +1,3 @@
-import { AuthGuard } from '@lib/guards';
 import { User } from '@lib/decorators';
 import { ResponseEntity } from '@lib/response';
 import { Controller, Body, Post, UseGuards } from '@nestjs/common';
@@ -6,6 +5,7 @@ import { ReservationResponse } from '../dto/responses';
 import { ReserveRequest } from '../dto/requests';
 import { ReserveUseCase } from '../../application/usecases';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { QueueGuard } from '../guards';
 
 @Controller('reservations')
 export class ReservationController {
@@ -21,7 +21,7 @@ export class ReservationController {
     description: '좌석 예약 성공',
     type: ReservationResponse,
   })
-  @UseGuards(AuthGuard)
+  @UseGuards(QueueGuard)
   @Post()
   async reserve(
     @User() user: { userId: string },

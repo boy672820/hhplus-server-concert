@@ -24,4 +24,16 @@ export class QueueRepositoryImpl implements QueueRepository {
     await this.dataSource.manager.save(entity);
     return QueueMapper.toModel(entity);
   }
+
+  async findByUserId(userId: string): Promise<Queue | null> {
+    const entity = await this.dataSource.manager.findOne(QueueEntity, {
+      where: { userId },
+    });
+    return entity ? QueueMapper.toModel(entity) : null;
+  }
+
+  async save(queue: Queue): Promise<void> {
+    const entity = QueueMapper.toEntity(queue);
+    await this.dataSource.manager.save(entity);
+  }
 }

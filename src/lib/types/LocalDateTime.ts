@@ -29,4 +29,11 @@ export class LocalDateTime {
 
   plusMinutes = (minutes: number): LocalDateTime =>
     new LocalDateTime(this.value.plusMinutes(minutes));
+
+  minusMinutes = (minutes: number): LocalDateTime =>
+    new LocalDateTime(this.value.minusMinutes(minutes));
+
+  toEqual = (other: LocalDateTime): boolean => this.value.equals(other.value);
+
+  isBeforeNow = (): boolean => this.value.isBefore(JodaDateTime.now());
 }

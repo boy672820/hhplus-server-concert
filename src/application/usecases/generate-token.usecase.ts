@@ -7,7 +7,7 @@ export class GenerateTokenUsecase {
 
   async execute({ userId }: { userId: string }): Promise<any> {
     const queue = await this.queueService.enqueue(userId);
-    const token = this.queueService.generateToken(queue);
+    const token = this.queueService.sign(queue);
     return token;
   }
 }

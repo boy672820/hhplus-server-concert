@@ -1,3 +1,4 @@
+import { LocalDateTime } from '@lib/types';
 import { DomainError } from '@lib/errors';
 import Decimal from 'decimal.js';
 import { Point } from './point.model';
@@ -9,7 +10,7 @@ describe('UserPointModel', () => {
     point = Point.from({
       userId: '1',
       balance: new Decimal(10_000),
-      updatedDate: new Date(),
+      updatedDate: LocalDateTime.now(),
     });
   });
 
