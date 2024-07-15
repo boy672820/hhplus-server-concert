@@ -1,25 +1,19 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ExecutionContext, Injectable } from '@nestjs/common';
+import { BearerGuard } from './bearer.guard';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
-    if (!token) {
-      throw new UnauthorizedException();
-    }
-    request['user'] = { userId: token };
-    return true;
+export class AuthGuard extends BearerGuard {
+  constructor() {
+    super();
   }
 
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] =
-      (request.headers as any).authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    await super.canActivate(context);
+
+    const request = context.switchToHttp().getRequest();
+
+    request['user'] = { userId: request.bearer };
+
+    return true;
   }
 }
