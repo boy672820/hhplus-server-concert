@@ -27,7 +27,7 @@ describe('UserPointModel', () => {
         const amount = new Decimal(20_000);
 
         expect(() => point.pay(amount)).toThrow(
-          DomainError.limitExceeded('포인트가 부족합니다.'),
+          DomainError.limitExceeded('잔액이 부족합니다.'),
         );
       });
     });

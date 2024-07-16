@@ -48,7 +48,7 @@ export class PointService {
     const userPoint = await this.pointRepository.findByUserId(userId);
 
     if (!userPoint) {
-      throw DomainError.unauthorized('사용자를 찾을 수 없습니다.');
+      throw DomainError.limitExceeded('잔액이 부족합니다.');
     }
 
     userPoint.pay(amount);
