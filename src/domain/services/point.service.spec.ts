@@ -97,7 +97,7 @@ describe('PointService', () => {
   describe('포인트 결제', () => {
     it('포인트로 결제합니다.', async () => {
       const userId = '1';
-      const amount = new Decimal(1_000);
+      const amount = new Decimal(50);
       const spyOnPay = jest.spyOn(point, 'pay');
 
       const result = await service.pay({ userId, amount });
