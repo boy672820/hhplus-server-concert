@@ -1,4 +1,5 @@
 import Decimal from 'decimal.js';
+import { DomainError } from '../../lib/errors';
 
 interface Props {
   userId: string;
@@ -26,7 +27,7 @@ export class Point implements Props {
 
   pay(amount: Decimal): void {
     if (this.balance.lt(amount)) {
-      throw new Error('포인트가 부족합니다.');
+      throw DomainError.limitExceeded('잔액이 부족합니다.');
     }
 
     this.balance = this.balance.minus(amount);

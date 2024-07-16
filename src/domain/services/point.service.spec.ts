@@ -114,7 +114,7 @@ describe('PointService', () => {
         pointRepository.findByUserId.mockResolvedValueOnce(null);
 
         return expect(service.pay({ userId, amount })).rejects.toThrow(
-          DomainError.unauthorized('사용자를 찾을 수 없습니다.'),
+          DomainError.limitExceeded('잔액이 부족합니다.'),
         );
       });
     });
