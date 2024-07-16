@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Transactional } from 'typeorm-transactional';
 import { ReservationService, SeatService } from '../../domain/services';
 import { Reservation } from '../../domain/models';
 
@@ -9,6 +10,7 @@ export class ReserveUseCase {
     private readonly reservationService: ReservationService,
   ) {}
 
+  @Transactional()
   async execute({
     userId,
     seatId,

@@ -2,6 +2,12 @@ import { AppConfigModule, AppConfigService } from '@config/app';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DatabaseConfigModule, DatabaseConfigService } from '@config/database';
+import { DataSource, DataSourceOptions } from 'typeorm';
+import {
+  addTransactionalDataSource,
+  initializeTransactionalContext,
+  StorageDriver,
+} from 'typeorm-transactional';
 
 @Module({
   imports: [
@@ -23,6 +29,13 @@ import { DatabaseConfigModule, DatabaseConfigService } from '@config/database';
         logging: appConfig.nodeEnv === 'debug',
       }),
       inject: [AppConfigService, DatabaseConfigService],
+      dataSourceFactory: async (options: DataSourceOptions) => {
+        const dataSource = new DataSource(options);
+        dataSource.initialize();
+        initializeTransactionalContext({ storageDriver: StorageDriver.AUTO });
+        addTransactionalDataSource(dataSource);
+        return dataSource;
+      },
     }),
   ],
 })
