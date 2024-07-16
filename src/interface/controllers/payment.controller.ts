@@ -1,6 +1,7 @@
 import { User } from '@lib/decorators';
+import { AuthGuard } from '@lib/guards';
 import { ResponseEntity } from '@lib/response';
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { PaymentResponse } from '../dto/responses';
 import { PayReservationUseCase } from '../../application/usecases';
 import { PayRequest } from '../dto/requests';
@@ -20,6 +21,7 @@ export class PaymentController {
     type: PaymentResponse,
     description: '결제 정보',
   })
+  @UseGuards(AuthGuard)
   @Post()
   async pay(
     @User() user: { userId: string },
