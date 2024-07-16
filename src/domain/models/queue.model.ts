@@ -1,17 +1,17 @@
-import { LocalDateTime } from '@lib/types';
-import { DomainError } from '../../lib/errors';
+import { LocalDateTime, QueueStatus } from '@lib/types';
+import { DomainError } from '@lib/errors';
 
 interface Props {
   sequence: number;
   userId: string;
-  isAvailable: boolean;
+  status: QueueStatus;
   expiresDate: LocalDateTime;
 }
 
 export class Queue implements Props {
   sequence: number;
   userId: string;
-  isAvailable: boolean;
+  status: QueueStatus;
   expiresDate: LocalDateTime;
 
   private constructor(props: Props) {
@@ -22,7 +22,7 @@ export class Queue implements Props {
     new Queue({
       sequence: 1,
       userId,
-      isAvailable: false,
+      status: QueueStatus.Waiting,
       expiresDate: LocalDateTime.now().plusMinutes(5),
     });
 
@@ -52,7 +52,7 @@ export class Queue implements Props {
           sequence: 0,
           userId: '',
           expiresDate: LocalDateTime.now(),
-          isAvailable: false,
+          status: QueueStatus.Waiting,
         }),
       )
       .validate();
@@ -75,18 +75,18 @@ export class Queue implements Props {
       throw DomainError.forbidden('만료된 대기열 토큰입니다.');
     }
 
-    if (!this.isAvailable) {
+    if (this.status === QueueStatus.Waiting) {
       throw DomainError.forbidden('아직 순번이 아닙니다.');
     }
 
     return true;
   }
 
-  available(): void {
-    this.isAvailable = true;
+  activate(): void {
+    this.status = QueueStatus.Active;
   }
 
   expire(): void {
-    this.isAvailable = false;
+    this.status = QueueStatus.Expired;
   }
 }

@@ -3,6 +3,8 @@ import { QueueRepository } from '../repositories';
 import { Queue } from '../models';
 import { DomainError } from '../../lib/errors';
 
+const QUEUE_USER_ACTIVE_LIMIT = 10;
+
 @Injectable()
 export class QueueService {
   constructor(private readonly queueRepository: QueueRepository) {}
@@ -44,5 +46,23 @@ export class QueueService {
     queue.expire();
 
     await this.queueRepository.save(queue);
+  }
+
+  async activateQueueUsers(): Promise<void> {
+    const activeCount = await this.queueRepository.getActiveCount();
+
+    if (activeCount >= QUEUE_USER_ACTIVE_LIMIT) {
+      return;
+    }
+
+    const total = QUEUE_USER_ACTIVE_LIMIT - activeCount;
+
+    const users = await this.queueRepository.findWaitingUsersByLimit(total);
+
+    users.forEach((user) => {
+      user.activate();
+    });
+
+    await this.queueRepository.save(users);
   }
 }

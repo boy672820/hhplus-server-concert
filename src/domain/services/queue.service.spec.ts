@@ -82,4 +82,31 @@ describe('QueueService', () => {
       });
     });
   });
+
+  describe('대기중인 사용자 활성화', () => {
+    it('대기중인 사용자를 활성화합니다.', async () => {
+      const activeCount = 0;
+      const users = [queue];
+      const spyOnActivate = jest.spyOn(queue, 'activate');
+
+      queueRepository.getActiveCount.mockResolvedValueOnce(activeCount);
+      queueRepository.findWaitingUsersByLimit.mockResolvedValueOnce(users);
+
+      await service.activateQueueUsers();
+
+      expect(spyOnActivate).toHaveBeenCalled();
+      expect(queueRepository.save).toHaveBeenCalledWith(users);
+    });
+
+    it('대기중인 사용자가 없을 경우, 활성화하지 않습니다.', async () => {
+      const activeCount = 11;
+
+      queueRepository.getActiveCount.mockResolvedValueOnce(activeCount);
+
+      await service.activateQueueUsers();
+
+      expect(queueRepository.findWaitingUsersByLimit).not.toHaveBeenCalled();
+      expect(queueRepository.save).not.toHaveBeenCalled();
+    });
+  });
 });

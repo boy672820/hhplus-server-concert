@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import { validate } from './env.validator';
 import { DomainExceptionFilter } from './domain-exception.filter';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { DomainExceptionFilter } from './domain-exception.filter';
       validate,
     }),
     DatabaseModule,
+    ScheduleModule.forRoot(),
   ],
   providers: [
     {

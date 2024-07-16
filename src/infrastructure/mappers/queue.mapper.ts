@@ -6,7 +6,7 @@ export class QueueMapper {
     Queue.from({
       sequence: entity.sequence,
       userId: entity.userId,
-      isAvailable: entity.isAvailable,
+      status: entity.status,
       expiresDate: entity.expiresDate,
     });
 
@@ -14,7 +14,7 @@ export class QueueMapper {
     const entity = new QueueEntity();
     entity.sequence = model.sequence;
     entity.userId = model.userId;
-    entity.isAvailable = model.isAvailable;
+    entity.status = model.status;
     entity.expiresDate = model.expiresDate;
     return entity;
   }
