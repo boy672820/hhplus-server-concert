@@ -27,7 +27,11 @@ export class PointService {
       return point;
     }
 
-    const newPoint = Point.create(userId);
+    const newPoint = Point.from({
+      userId,
+      balance: new Decimal(amount),
+      updatedDate: new Date(),
+    });
 
     await this.pointRepository.save(newPoint);
 
