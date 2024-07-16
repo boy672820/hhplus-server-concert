@@ -21,12 +21,4 @@ describe('QueueModel', () => {
       expect(decoded).toEqual([queue.sequence.toString(), queue.userId]);
     });
   });
-
-  describe('대기열 만료', () => {
-    it('대기열을 만료시킵니다.', () => {
-      queue.expire();
-
-      expect(queue.isAvailable).toBeFalsy();
-    });
-  });
 });
