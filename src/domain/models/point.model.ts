@@ -1,16 +1,17 @@
+import { LocalDateTime } from '@lib/types';
+import { DomainError } from '@lib/errors';
 import Decimal from 'decimal.js';
-import { DomainError } from '../../lib/errors';
 
 interface Props {
   userId: string;
   balance: Decimal;
-  updatedDate: Date;
+  updatedDate: LocalDateTime;
 }
 
 export class Point implements Props {
   userId: string;
   balance: Decimal;
-  updatedDate: Date;
+  updatedDate: LocalDateTime;
 
   private constructor(props: Props) {
     Object.assign(this, props);
@@ -22,7 +23,7 @@ export class Point implements Props {
     new Point({
       userId,
       balance: new Decimal(0),
-      updatedDate: new Date(),
+      updatedDate: LocalDateTime.now(),
     });
 
   pay(amount: Decimal): void {
@@ -31,6 +32,6 @@ export class Point implements Props {
     }
 
     this.balance = this.balance.minus(amount);
-    this.updatedDate = new Date();
+    this.updatedDate = LocalDateTime.now();
   }
 }
