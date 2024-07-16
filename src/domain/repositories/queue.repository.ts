@@ -7,6 +7,6 @@ export abstract class QueueRepository {
     isAvailable: boolean;
     expiresDate: LocalDateTime;
   }): Promise<Queue>;
-  abstract findByUserId(userId: string): Promise<Queue | null>;
+  abstract findLastestByUserId(userId: string): Promise<Queue | null>;
   abstract save(queue: Queue): Promise<void>;
 }

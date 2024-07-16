@@ -25,9 +25,10 @@ export class QueueRepositoryImpl implements QueueRepository {
     return QueueMapper.toModel(entity);
   }
 
-  async findByUserId(userId: string): Promise<Queue | null> {
+  async findLastestByUserId(userId: string): Promise<Queue | null> {
     const entity = await this.dataSource.manager.findOne(QueueEntity, {
       where: { userId },
+      order: { sequence: 'DESC' },
     });
     return entity ? QueueMapper.toModel(entity) : null;
   }

@@ -14,6 +14,7 @@ export class PayReservationUseCase {
     private readonly seatService: SeatService,
     private readonly userService: PointService,
     private readonly paymentService: PaymentService,
+    private readonly queueService: QueueService,
   ) {}
 
   async execute({
@@ -29,6 +30,8 @@ export class PayReservationUseCase {
     });
     await this.seatService.pay({ seatId: reservation.seatId });
     await this.userService.pay({ userId, amount: reservation.price });
+
+    await this.queueService.expire(userId);
 
     const payment = await this.paymentService.create({
       reservationId,

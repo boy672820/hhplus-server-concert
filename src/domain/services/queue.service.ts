@@ -23,7 +23,7 @@ export class QueueService {
   }
 
   async verify(queue: Queue): Promise<Queue> {
-    const user = await this.queueRepository.findByUserId(queue.userId);
+    const user = await this.queueRepository.findLastestByUserId(queue.userId);
 
     if (!user) {
       throw DomainError.notFound('사용자를 찾을 수 없습니다.');
@@ -32,5 +32,17 @@ export class QueueService {
     user.checkAvailable();
 
     return queue;
+  }
+
+  async expire(userId: string): Promise<void> {
+    const queue = await this.queueRepository.findLastestByUserId(userId);
+
+    if (!queue) {
+      throw DomainError.notFound('사용자를 찾을 수 없습니다.');
+    }
+
+    queue.expire();
+
+    await this.queueRepository.save(queue);
   }
 }

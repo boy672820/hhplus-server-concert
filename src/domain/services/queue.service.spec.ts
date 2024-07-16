@@ -21,7 +21,7 @@ describe('QueueService', () => {
     service = new QueueService(queueRepository);
 
     queueRepository.create.mockResolvedValue(queue);
-    queueRepository.findByUserId.mockResolvedValue(queue);
+    queueRepository.findLastestByUserId.mockResolvedValue(queue);
   });
 
   describe('대기열 토큰 생성', () => {
@@ -53,9 +53,30 @@ describe('QueueService', () => {
 
     describe('다음의 경우 검증에 실패합니다.', () => {
       it('사용자를 찾을 수 없을 경우', async () => {
-        queueRepository.findByUserId.mockResolvedValue(null);
+        queueRepository.findLastestByUserId.mockResolvedValue(null);
 
         await expect(service.verify(queue)).rejects.toThrow(
+          DomainError.notFound('사용자를 찾을 수 없습니다.'),
+        );
+      });
+    });
+  });
+
+  describe('대기열 토큰 만료', () => {
+    it('대기열 토큰을 만료시킵니다.', async () => {
+      const spyOnExpire = jest.spyOn(queue, 'expire');
+
+      await service.expire(queue.userId);
+
+      expect(spyOnExpire).toHaveBeenCalled();
+      expect(queueRepository.save).toHaveBeenCalledWith(queue);
+    });
+
+    describe('다음의 경우 만료에 실패합니다.', () => {
+      it('사용자를 찾을 수 없을 경우', async () => {
+        queueRepository.findLastestByUserId.mockResolvedValue(null);
+
+        await expect(service.expire(queue.userId)).rejects.toThrow(
           DomainError.notFound('사용자를 찾을 수 없습니다.'),
         );
       });
