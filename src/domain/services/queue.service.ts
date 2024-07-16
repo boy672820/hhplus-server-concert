@@ -33,18 +33,4 @@ export class QueueService {
 
     return queue;
   }
-
-  async expire(userId: string): Promise<Queue> {
-    const queue = await this.queueRepository.findByUserId(userId);
-
-    if (!queue) {
-      throw DomainError.notFound('사용자를 찾을 수 없습니다.');
-    }
-
-    queue.expire();
-
-    await this.queueRepository.save(queue);
-
-    return queue;
-  }
 }
