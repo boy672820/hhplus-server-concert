@@ -13,8 +13,8 @@ const event = Event.create({
   endDate: LocalDateTime.now(),
 });
 const reservation = Reservation.create({
-  userId: 'user-id',
-  eventId: 'event-id',
+  userId: '1',
+  eventId: '1',
   eventTitle: 'event-title',
   eventAddress: 'event-address',
   eventStartDate: LocalDateTime.now(),
@@ -91,9 +91,10 @@ describe('ReservationService', () => {
 
     describe('예약 결제', () => {
       it('예약을 결제합니다.', async () => {
+        const userId = '1';
         const reservationId = '1';
 
-        const result = await service.pay(reservationId);
+        const result = await service.pay({ userId, reservationId });
 
         expect(result).toEqual(reservation);
         expect(reservationRepository.save).toHaveBeenCalledWith(reservation);
@@ -101,10 +102,11 @@ describe('ReservationService', () => {
 
       describe('예약 결제에 실패하는 경우', () => {
         it('예약을 찾을 수 없는 경우', () => {
+          const userId = '1';
           const reservationId = '1';
           reservationRepository.findById.mockResolvedValueOnce(null);
 
-          expect(service.pay(reservationId)).rejects.toThrow(
+          expect(service.pay({ userId, reservationId })).rejects.toThrow(
             DomainError.notFound('예약을 찾을 수 없습니다.'),
           );
         });
