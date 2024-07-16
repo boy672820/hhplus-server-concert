@@ -1,3 +1,4 @@
+import { LocalDateTime } from '@lib/types';
 import { Injectable } from '@nestjs/common';
 import { DomainError } from '@lib/errors';
 import Decimal from 'decimal.js';
@@ -30,7 +31,7 @@ export class PointService {
     const newPoint = Point.from({
       userId,
       balance: new Decimal(amount),
-      updatedDate: new Date(),
+      updatedDate: LocalDateTime.now(),
     });
 
     await this.pointRepository.save(newPoint);
