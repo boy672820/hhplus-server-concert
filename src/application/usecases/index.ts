@@ -6,3 +6,4 @@ export * from './reserve.usecase';
 export * from './pay-reservation.usecase';
 export * from './validate-queue.usecase';
 export * from './activate-queue-users.usecase';
+export * from './expire-queue-users.usecase';

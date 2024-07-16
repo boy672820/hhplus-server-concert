@@ -1,4 +1,4 @@
-import { LocalDateTime } from '@lib/types';
+import { LocalDateTime, QueueStatus } from '@lib/types';
 import { DomainError } from '@lib/errors';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { QueueRepository } from '../repositories';
@@ -8,7 +8,7 @@ import { Queue } from '../models';
 const queue = Queue.from({
   userId: '1',
   sequence: 1,
-  isAvailable: true,
+  status: QueueStatus.Active,
   expiresDate: LocalDateTime.now().plusMinutes(5),
 });
 
@@ -107,6 +107,20 @@ describe('QueueService', () => {
 
       expect(queueRepository.findWaitingUsersByLimit).not.toHaveBeenCalled();
       expect(queueRepository.save).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('활성화된 사용자 비활성화', () => {
+    it('활성화된 사용자를 비활성화합니다.', async () => {
+      const activeUsers = [queue];
+      const spyOnExpire = jest.spyOn(queue, 'expire');
+
+      queueRepository.findActiveUsers.mockResolvedValueOnce(activeUsers);
+
+      await service.expireQueueUsers();
+
+      expect(spyOnExpire).toHaveBeenCalled();
+      expect(queueRepository.save).toHaveBeenCalledWith(activeUsers);
     });
   });
 });

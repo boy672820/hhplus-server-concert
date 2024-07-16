@@ -65,4 +65,14 @@ export class QueueService {
 
     await this.queueRepository.save(users);
   }
+
+  async expireQueueUsers(): Promise<void> {
+    const activeUsers = await this.queueRepository.findActiveUsers();
+
+    activeUsers.forEach((user) => {
+      user.expire();
+    });
+
+    await this.queueRepository.save(activeUsers);
+  }
 }

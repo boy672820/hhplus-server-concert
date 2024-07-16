@@ -11,4 +11,5 @@ export abstract class QueueRepository {
   abstract save(queue: Queue | Queue[]): Promise<void>;
   abstract getActiveCount(): Promise<number>;
   abstract findWaitingUsersByLimit(limit: number): Promise<Queue[]>;
+  abstract findActiveUsers(): Promise<Queue[]>;
 }

@@ -54,4 +54,11 @@ export class QueueRepositoryImpl implements QueueRepository {
     });
     return entities.map(QueueMapper.toModel);
   }
+
+  async findActiveUsers(): Promise<Queue[]> {
+    const entities = await this.dataSource.manager.find(QueueEntity, {
+      where: { status: QueueStatus.Active },
+    });
+    return entities.map(QueueMapper.toModel);
+  }
 }
