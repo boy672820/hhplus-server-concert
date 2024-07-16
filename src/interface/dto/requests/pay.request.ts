@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class PayRequest {
   @ApiProperty({
@@ -7,6 +7,6 @@ export class PayRequest {
     description: '예약 ID',
   })
   @IsString()
-  @IsEmpty()
+  @IsNotEmpty()
   public readonly reservationId: string;
 }
