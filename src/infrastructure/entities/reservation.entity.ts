@@ -42,7 +42,7 @@ export class ReservationEntity {
   @ColumnDatetime({ nullable: true })
   expiresDate: LocalDateTime | null;
 
-  @OneToOne(() => SeatEntity, { cascade: true, nullable: false })
+  @OneToOne(() => SeatEntity, { cascade: true, nullable: false, eager: true })
   @JoinColumn({ name: 'seatId' })
   seat: SeatEntity;
 
