@@ -1,8 +1,14 @@
 import { DomainError, DomainErrorCode } from '@lib/errors';
-import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, Inject } from '@nestjs/common';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 @Catch(DomainError)
 export class DomainExceptionFilter implements ExceptionFilter {
+  constructor(
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+  ) {}
+
   catch(error: DomainError, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<any>();
@@ -44,10 +50,6 @@ export class DomainExceptionFilter implements ExceptionFilter {
           message: error.message,
         });
       case DomainErrorCode.InternalError:
-        return response.status(500).json({
-          code: 500,
-          message: error.message,
-        });
       default:
         return response.status(500).json({
           code: 500,

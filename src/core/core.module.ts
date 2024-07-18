@@ -1,10 +1,12 @@
 import { DatabaseModule } from '@lib/database';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
 import { validate } from './env.validator';
 import { DomainExceptionFilter } from './domain-exception.filter';
-import { ScheduleModule } from '@nestjs/schedule';
+import { LoggingInterceptor } from './logging.interceptor';
+import { LoggingModule } from './logging.module';
 
 @Module({
   imports: [
@@ -13,13 +15,18 @@ import { ScheduleModule } from '@nestjs/schedule';
       envFilePath: '.env',
       validate,
     }),
-    DatabaseModule,
     ScheduleModule.forRoot(),
+    DatabaseModule,
+    LoggingModule,
   ],
   providers: [
     {
       provide: APP_FILTER,
       useClass: DomainExceptionFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
     },
   ],
 })
