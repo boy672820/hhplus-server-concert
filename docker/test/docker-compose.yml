@@ -1,0 +1,14 @@
+version: '3.1'
+
+services:
+  testdb:
+    image: mysql
+    restart: always
+    ports:
+      - '${DATABASE_PORT}:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: 123
+      MYSQL_DATABASE: '${DATABASE_NAME}'
+      MYSQL_USER: '${DATABASE_USERNAME}'
+      MYSQL_PASSWORD: '${DATABASE_PASSWORD}'
+      TZ: Asia/Seoul
