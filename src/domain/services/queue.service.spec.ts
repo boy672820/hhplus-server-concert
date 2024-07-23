@@ -1,4 +1,4 @@
-import { LocalDateTime } from '@lib/types';
+import { LocalDateTime, QueueStatus } from '@lib/types';
 import { DomainError } from '@lib/errors';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { QueueRepository } from '../repositories';
@@ -8,7 +8,7 @@ import { Queue } from '../models';
 const queue = Queue.from({
   userId: '1',
   sequence: 1,
-  isAvailable: true,
+  status: QueueStatus.Active,
   expiresDate: LocalDateTime.now().plusMinutes(5),
 });
 
@@ -80,6 +80,47 @@ describe('QueueService', () => {
           DomainError.notFound('사용자를 찾을 수 없습니다.'),
         );
       });
+    });
+  });
+
+  describe('대기중인 사용자 활성화', () => {
+    it('대기중인 사용자를 활성화합니다.', async () => {
+      const activeCount = 0;
+      const users = [queue];
+      const spyOnActivate = jest.spyOn(queue, 'activate');
+
+      queueRepository.getActiveCount.mockResolvedValueOnce(activeCount);
+      queueRepository.findWaitingUsersByLimit.mockResolvedValueOnce(users);
+
+      await service.activateQueueUsers();
+
+      expect(spyOnActivate).toHaveBeenCalled();
+      expect(queueRepository.save).toHaveBeenCalledWith(users);
+    });
+
+    it('대기중인 사용자가 없을 경우, 활성화하지 않습니다.', async () => {
+      const activeCount = 11;
+
+      queueRepository.getActiveCount.mockResolvedValueOnce(activeCount);
+
+      await service.activateQueueUsers();
+
+      expect(queueRepository.findWaitingUsersByLimit).not.toHaveBeenCalled();
+      expect(queueRepository.save).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('활성화된 사용자 비활성화', () => {
+    it('활성화된 사용자를 비활성화합니다.', async () => {
+      const activeUsers = [queue];
+      const spyOnExpire = jest.spyOn(queue, 'expire');
+
+      queueRepository.findActiveUsers.mockResolvedValueOnce(activeUsers);
+
+      await service.expireQueueUsers();
+
+      expect(spyOnExpire).toHaveBeenCalled();
+      expect(queueRepository.save).toHaveBeenCalledWith(activeUsers);
     });
   });
 });

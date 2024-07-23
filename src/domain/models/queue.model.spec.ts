@@ -1,4 +1,4 @@
-import { LocalDateTime } from '@lib/types';
+import { LocalDateTime, QueueStatus } from '@lib/types';
 import { Queue } from './queue.model';
 import { DomainError } from '../../lib/errors';
 
@@ -9,7 +9,7 @@ describe('QueueModel', () => {
     queue = Queue.from({
       sequence: 1,
       userId: '1',
-      isAvailable: false,
+      status: QueueStatus.Active,
       expiresDate: LocalDateTime.now().plusMinutes(5),
     });
   });
@@ -50,7 +50,7 @@ describe('QueueModel', () => {
 
   describe('대기열 토큰 유효성 검사', () => {
     it('대기열 토큰이 유효합니다.', () => {
-      queue.available();
+      queue.activate();
 
       expect(queue.validate()).toEqual(queue);
     });
@@ -65,7 +65,7 @@ describe('QueueModel', () => {
       });
 
       it('대기열 토큰이 아직 순번이 아닙니다.', () => {
-        queue.isAvailable = false;
+        queue.status = QueueStatus.Waiting;
 
         expect(() => queue.checkAvailable()).toThrow(
           DomainError.forbidden('아직 순번이 아닙니다.'),
@@ -76,17 +76,21 @@ describe('QueueModel', () => {
 
   describe('대기열 유효하게 만들기', () => {
     it('대기열을 유효하게 만듭니다.', () => {
-      queue.isAvailable = true;
+      queue.status = QueueStatus.Waiting;
 
-      expect(queue.isAvailable).toBeTruthy();
+      queue.activate();
+
+      expect(queue.status).toEqual(QueueStatus.Active);
     });
   });
 
   describe('대기열 만료', () => {
     it('대기열을 만료시킵니다.', () => {
+      queue.expiresDate = LocalDateTime.now().minusMinutes(1);
+
       queue.expire();
 
-      expect(queue.isAvailable).toBeFalsy();
+      expect(queue.status).toEqual(QueueStatus.Expired);
     });
   });
 });

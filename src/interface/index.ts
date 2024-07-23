@@ -5,6 +5,7 @@ import { EventController } from './controllers/event.controller';
 import { ScheduleController } from './controllers/schedule.controller';
 import { ReservationController } from './controllers/reservation.controller';
 import { PaymentController } from './controllers/payment.controller';
+import { QueueScheduler } from './schedulers/queue.scheduler';
 
 export const controllers: Type<any>[] = [
   QueueController,
@@ -14,3 +15,5 @@ export const controllers: Type<any>[] = [
   ReservationController,
   PaymentController,
 ];
+
+export const schedulers: Type<any>[] = [QueueScheduler];

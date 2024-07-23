@@ -1,11 +1,11 @@
-import { LocalDateTime } from '@lib/types';
+import { LocalDateTime, QueueStatus } from '@lib/types';
 import { ColumnDatetime, ColumnUlid } from '@lib/decorators';
 import { Entity, PrimaryGeneratedColumn, Column, Index } from 'typeorm';
 
 export interface Queue {
   sequence: number;
   userId: string;
-  isAvailable: boolean;
+  status: QueueStatus;
   expiresDate: LocalDateTime;
 }
 
@@ -18,8 +18,8 @@ export class QueueEntity implements Queue {
   @Index()
   userId: string;
 
-  @Column({ type: 'bool', default: false })
-  isAvailable: boolean;
+  @Column({ type: 'enum', enum: QueueStatus, default: QueueStatus.Waiting })
+  status: QueueStatus;
 
   @ColumnDatetime()
   expiresDate: LocalDateTime;

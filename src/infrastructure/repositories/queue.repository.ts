@@ -1,4 +1,4 @@
-import { LocalDateTime } from '@lib/types';
+import { LocalDateTime, QueueStatus } from '@lib/types';
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
@@ -13,12 +13,12 @@ export class QueueRepositoryImpl implements QueueRepository {
 
   async create(input: {
     userId: string;
-    isAvailable: boolean;
+    status: QueueStatus;
     expiresDate: LocalDateTime;
   }): Promise<Queue> {
     const entity = await this.dataSource.manager.create(QueueEntity, {
       userId: input.userId,
-      isAvailable: input.isAvailable,
+      status: input.status,
       expiresDate: input.expiresDate,
     });
     await this.dataSource.manager.save(entity);
@@ -33,8 +33,32 @@ export class QueueRepositoryImpl implements QueueRepository {
     return entity ? QueueMapper.toModel(entity) : null;
   }
 
-  async save(queue: Queue): Promise<void> {
-    const entity = QueueMapper.toEntity(queue);
+  async save(queue: Queue | Queue[]): Promise<void> {
+    const entity = Array.isArray(queue)
+      ? queue.map(QueueMapper.toEntity)
+      : QueueMapper.toEntity(queue);
     await this.dataSource.manager.save(entity);
+  }
+
+  async getActiveCount(): Promise<number> {
+    const result = await this.dataSource.manager.count(QueueEntity, {
+      where: { status: QueueStatus.Active },
+    });
+    return result;
+  }
+
+  async findWaitingUsersByLimit(limit: number): Promise<Queue[]> {
+    const entities = await this.dataSource.manager.find(QueueEntity, {
+      where: { status: QueueStatus.Waiting },
+      take: limit,
+    });
+    return entities.map(QueueMapper.toModel);
+  }
+
+  async findActiveUsers(): Promise<Queue[]> {
+    const entities = await this.dataSource.manager.find(QueueEntity, {
+      where: { status: QueueStatus.Active },
+    });
+    return entities.map(QueueMapper.toModel);
   }
 }

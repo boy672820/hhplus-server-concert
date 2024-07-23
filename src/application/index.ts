@@ -1,5 +1,7 @@
 import { Type } from '@nestjs/common';
 import {
+  ActivateQueueUsersUseCase,
+  ExpireQueueUsersUseCase,
   FindAvailableSeatsUseCase,
   FindEventsUseCase,
   FindSchedulesBetweenUseCase,
@@ -17,4 +19,6 @@ export const usecases: Type<any>[] = [
   ReserveUseCase,
   PayReservationUseCase,
   ValidateQueueUseCase,
+  ActivateQueueUsersUseCase,
+  ExpireQueueUsersUseCase,
 ];
