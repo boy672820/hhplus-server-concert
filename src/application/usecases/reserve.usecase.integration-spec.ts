@@ -56,14 +56,6 @@ describe('ReserveUseCase (Integration)', () => {
     users = await Promise.all([
       seedPoint({ dataSource }),
       seedPoint({ dataSource }),
-      seedPoint({ dataSource }),
-      seedPoint({ dataSource }),
-      seedPoint({ dataSource }),
-      seedPoint({ dataSource }),
-      seedPoint({ dataSource }),
-      seedPoint({ dataSource }),
-      seedPoint({ dataSource }),
-      seedPoint({ dataSource }),
     ]);
   });
 
@@ -73,9 +65,13 @@ describe('ReserveUseCase (Integration)', () => {
 
   describe('좌석 예약 (Concurrency Testing)', () => {
     it('동시에 같은 좌석을 예약하려고 할 때, 하나의 예약만 성공해야 한다.', async () => {
-      expect(reserveUseCase).toBeDefined();
-      expect(seat).toBeDefined();
-      expect(users.length).toBe(10);
+      const seatId = seat.id;
+
+      await expect(
+        Promise.all(
+          users.map(({ userId }) => reserveUseCase.execute({ userId, seatId })),
+        ),
+      ).resolves.toHaveLength(1);
     });
   });
 });
