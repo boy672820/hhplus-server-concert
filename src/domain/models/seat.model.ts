@@ -12,6 +12,7 @@ export interface SeatProps {
   number: number;
   status: SeatStatus;
   price: Decimal;
+  version: number;
 }
 
 export class Seat implements SeatProps {
@@ -23,6 +24,7 @@ export class Seat implements SeatProps {
   number: number;
   status: SeatStatus;
   price: Decimal;
+  version: number;
 
   private constructor(props: SeatProps) {
     Object.assign(this, props);
@@ -38,7 +40,8 @@ export class Seat implements SeatProps {
       | 'number'
       | 'price'
     >,
-  ): Seat => new Seat({ ...props, id: ulid(), status: SeatStatus.Pending });
+  ): Seat =>
+    new Seat({ ...props, id: ulid(), status: SeatStatus.Pending, version: 0 });
 
   static from = (props: SeatProps): Seat => new Seat(props);
 

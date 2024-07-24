@@ -9,6 +9,7 @@ import {
   StorageDriver,
 } from 'typeorm-transactional';
 import { join } from 'path';
+import { OptimisticLockingSubscriber } from './optimistic-locking.subscriber';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { join } from 'path';
         synchronize: ['development', 'debug'].includes(appConfig.nodeEnv),
         migrationsTableName: 'typeorm_migrations',
         migrations: [join(__dirname, '/../../typeorm/migrations/*{.ts,.js}')],
+        subscribers: [OptimisticLockingSubscriber],
         logging: appConfig.nodeEnv === 'debug',
       }),
       inject: [AppConfigService, DatabaseConfigService],

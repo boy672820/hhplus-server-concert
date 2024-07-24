@@ -1,3 +1,4 @@
+import { SeatStatus } from '@lib/types';
 import { seedPoint, seedSeat } from '@lib/fixtures';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
@@ -20,6 +21,7 @@ import { PointEntity } from '../../infrastructure/entities/point.entity';
 describe('ReserveUseCase (Integration)', () => {
   let app: INestApplication;
   let reserveUseCase: ReserveUseCase;
+  let seatRepository: SeatRepository;
   let seat: SeatEntity;
   let users: PointEntity[];
 
@@ -47,16 +49,16 @@ describe('ReserveUseCase (Integration)', () => {
 
     app = moduleRef.createNestApplication();
     reserveUseCase = moduleRef.get(ReserveUseCase);
+    seatRepository = moduleRef.get(SeatRepository);
 
     await app.init();
 
     const dataSource = moduleRef.get<DataSource>(getDataSourceToken());
 
     seat = await seedSeat({ dataSource });
-    users = await Promise.all([
-      seedPoint({ dataSource }),
-      seedPoint({ dataSource }),
-    ]);
+    users = await Promise.all(
+      Array.from({ length: 1_000 }, () => seedPoint({ dataSource })),
+    );
   });
 
   afterEach(async () => {
@@ -71,7 +73,11 @@ describe('ReserveUseCase (Integration)', () => {
         Promise.all(
           users.map(({ userId }) => reserveUseCase.execute({ userId, seatId })),
         ),
-      ).resolves.toHaveLength(1);
+      ).rejects.toThrow();
+
+      const assignedSeat = await seatRepository.findById(seatId);
+
+      expect(assignedSeat?.status).toBe(SeatStatus.InProgress);
     });
   });
 });

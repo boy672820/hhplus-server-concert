@@ -13,6 +13,7 @@ export class SeatMapper {
       number: entity.number,
       status: entity.status,
       price: entity.price,
+      version: entity.version,
     });
 
   static toEntity = (model: Seat): SeatEntity => {
@@ -22,6 +23,7 @@ export class SeatMapper {
     entity.number = model.number;
     entity.status = model.status;
     entity.price = model.price;
+    entity.version = model.version;
     entity.schedule = new ScheduleEntity();
     entity.schedule.id = model.scheduleId;
     return entity;
