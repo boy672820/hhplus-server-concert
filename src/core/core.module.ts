@@ -1,4 +1,5 @@
 import { DatabaseModule } from '@lib/database';
+import { RedisModule } from '@lib/redis';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -17,6 +18,7 @@ import { LoggingModule } from './logging.module';
     }),
     ScheduleModule.forRoot(),
     DatabaseModule,
+    RedisModule,
     LoggingModule,
   ],
   providers: [

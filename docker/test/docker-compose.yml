@@ -12,3 +12,8 @@ services:
       MYSQL_USER: '${DATABASE_USERNAME}'
       MYSQL_PASSWORD: '${DATABASE_PASSWORD}'
       TZ: Asia/Seoul
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - '${REDIS_PORT}:6379'

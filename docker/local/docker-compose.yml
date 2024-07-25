@@ -14,3 +14,8 @@ services:
       MYSQL_USER: concert
       MYSQL_PASSWORD: 123
       TZ: Asia/Seoul
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - '${REDIS_PORT}:6379'
