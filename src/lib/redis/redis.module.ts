@@ -1,18 +1,40 @@
 import { RedisConfigModule } from '@config/redis';
-import { Module, OnModuleDestroy } from '@nestjs/common';
-import { redisProvider, redlockProvider } from './redis.provider';
+import { Inject, Module, OnModuleDestroy } from '@nestjs/common';
+import {
+  PUBREDIS_PROVIDER,
+  pubRedisProvider,
+  redisProvider,
+  redlockProvider,
+  SUBREDIS_PROVIDER,
+  subRedisProvider,
+} from './redis.provider';
 import { InjectRedis } from '../decorators';
 import { Redis } from 'ioredis';
+import { RedlockService } from './redlock.service';
 
 @Module({
   imports: [RedisConfigModule],
-  providers: [redisProvider, redlockProvider],
-  exports: [redisProvider, redlockProvider],
+  providers: [
+    redisProvider,
+    subRedisProvider,
+    pubRedisProvider,
+    redlockProvider,
+    RedlockService,
+  ],
+  exports: [redisProvider, redlockProvider, RedlockService],
 })
 export class RedisModule implements OnModuleDestroy {
-  constructor(@InjectRedis() private readonly redis: Redis) {}
+  constructor(
+    @InjectRedis() private readonly redis: Redis,
+    @Inject(PUBREDIS_PROVIDER) private readonly pubRedis: Redis,
+    @Inject(SUBREDIS_PROVIDER) private readonly subRedis: Redis,
+  ) {}
 
   async onModuleDestroy() {
-    await this.redis.quit();
+    await Promise.all([
+      this.redis.quit(),
+      this.pubRedis.quit(),
+      this.subRedis.quit(),
+    ]);
   }
 }

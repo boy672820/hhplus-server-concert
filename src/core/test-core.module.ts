@@ -29,5 +29,6 @@ import { LoggingModule } from './logging.module';
       useClass: LoggingInterceptor,
     },
   ],
+  exports: [RedisModule],
 })
 export class TestCoreModule {}
