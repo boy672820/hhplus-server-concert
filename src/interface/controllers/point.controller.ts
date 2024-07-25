@@ -19,11 +19,15 @@ import {
 import { PointService } from '../../domain/services';
 import { ChargeRequest } from '../dto/requests';
 import { PointResponse } from '../dto/responses';
+import { RechargePointUseCase } from '../../application/usecases';
 
 @ApiTags('포인트')
 @Controller('point')
 export class PointController {
-  constructor(private readonly service: PointService) {}
+  constructor(
+    private readonly service: PointService,
+    private readonly rechargePointUseCase: RechargePointUseCase,
+  ) {}
 
   @ApiOperation({
     summary: '내 포인트 조회',
@@ -55,7 +59,10 @@ export class PointController {
     @User() user: { userId: string },
     @Body() { amount }: ChargeRequest,
   ): Promise<ResponseEntity<PointResponse>> {
-    const point = await this.service.charge(user.userId, amount);
+    const point = await this.rechargePointUseCase.execute({
+      userId: user.userId,
+      amount,
+    });
     return ResponseEntity.okWith(PointResponse.fromModel(point));
   }
 }
