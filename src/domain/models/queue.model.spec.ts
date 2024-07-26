@@ -86,8 +86,6 @@ describe('QueueModel', () => {
 
   describe('대기열 만료', () => {
     it('대기열을 만료시킵니다.', () => {
-      queue.expiresDate = LocalDateTime.now().minusMinutes(1);
-
       queue.expire();
 
       expect(queue.status).toEqual(QueueStatus.Expired);
