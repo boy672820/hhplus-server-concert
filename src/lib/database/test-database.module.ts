@@ -26,12 +26,10 @@ import { OptimisticLockingSubscriber } from './optimistic-locking.subscriber';
         password: databaseConfig.password,
         database: databaseConfig.database,
         entities: [join(__dirname, '/../../**/*.entity{.ts,.js}')],
-        charset: 'utf8mb4_general_ci',
-        synchronize: ['development', 'debug'].includes(appConfig.nodeEnv),
-        migrationsTableName: 'typeorm_migrations',
-        migrations: [join(__dirname, '/../../typeorm/migrations/*{.ts,.js}')],
         subscribers: [OptimisticLockingSubscriber],
+        charset: 'utf8mb4_general_ci',
         logging: appConfig.nodeEnv === 'debug',
+        synchronize: false,
       }),
       inject: [AppConfigService, DatabaseConfigService],
       dataSourceFactory: async (options: DataSourceOptions) => {
@@ -44,4 +42,4 @@ import { OptimisticLockingSubscriber } from './optimistic-locking.subscriber';
     }),
   ],
 })
-export class DatabaseModule {}
+export class TestDatabaseModule {}
