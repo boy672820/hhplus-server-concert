@@ -5,6 +5,7 @@ import { DomainError } from '@lib/errors';
 import Decimal from 'decimal.js';
 import { PointRepository } from '../repositories';
 import { Point } from '../models';
+import { runInTransaction } from 'typeorm-transactional';
 
 @Injectable()
 export class PointService {
@@ -27,21 +28,25 @@ export class PointService {
     const lock = await this.redlockService.acquire(['user_point', userId]);
 
     try {
-      const point = await this.pointRepository.findByUserId(userId);
+      const newPoint = await runInTransaction(async () => {
+        const point = await this.pointRepository.findByUserId(userId);
 
-      if (point) {
-        point.balance = point.balance.add(amount);
-        await this.pointRepository.save(point);
-        return point;
-      }
+        if (point) {
+          point.balance = point.balance.add(amount);
+          await this.pointRepository.save(point);
+          return point;
+        }
 
-      const newPoint = Point.from({
-        userId,
-        balance: new Decimal(amount),
-        updatedDate: LocalDateTime.now(),
+        const newPoint = Point.from({
+          userId,
+          balance: new Decimal(amount),
+          updatedDate: LocalDateTime.now(),
+        });
+
+        await this.pointRepository.save(newPoint);
+
+        return newPoint;
       });
-
-      await this.pointRepository.save(newPoint);
 
       return newPoint;
     } finally {
@@ -59,15 +64,19 @@ export class PointService {
     const lock = await this.redlockService.acquire(['user_point', userId]);
 
     try {
-      const userPoint = await this.pointRepository.findByUserId(userId);
+      const userPoint = await runInTransaction(async () => {
+        const userPoint = await this.pointRepository.findByUserId(userId);
 
-      if (!userPoint) {
-        throw DomainError.limitExceeded('잔액이 부족합니다.');
-      }
+        if (!userPoint) {
+          throw DomainError.limitExceeded('잔액이 부족합니다.');
+        }
 
-      userPoint.pay(amount);
+        userPoint.pay(amount);
 
-      await this.pointRepository.save(userPoint);
+        await this.pointRepository.save(userPoint);
+
+        return userPoint;
+      });
 
       return userPoint;
     } finally {
