@@ -104,7 +104,9 @@
     "testEnvironment": "node",
     "moduleNameMapper": {
       "^@lib$": "<rootDir>/lib",
-      "^@lib/(.*)$": "<rootDir>/lib/$1"
+      "^@lib/(.*)$": "<rootDir>/lib/$1",
+      "^@config$": "<rootDir>/config",
+      "^@config/(.*)$": "<rootDir>/config/$1"
     }
   }
 }
