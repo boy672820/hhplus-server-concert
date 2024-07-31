@@ -1,11 +1,16 @@
 version: '3.1'
 
 services:
-  testdb:
+  mysql:
     image: mysql
     restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: 2
+          memory: 4G
     ports:
-      - '${DATABASE_PORT}:3306'
+      - '3302:3306'
     environment:
       MYSQL_ROOT_PASSWORD: 123
       MYSQL_DATABASE: '${DATABASE_NAME}'
@@ -16,8 +21,17 @@ services:
     image: redis
     restart: always
     ports:
-      - '${REDIS_PORT}:6379'
-  kafka:
-    extends:
-      file: docker-compose.kafka.yml
-      service: broker
+      - '6377:6379'
+  server:
+    container_name: hhplus-server-concert
+    image: hhplus-server-concert:test
+    deploy:
+      resources:
+        limits:
+          cpus: 2
+          memory: 4G
+    build:
+      context: ../../
+      dockerfile: docker/test/Dockerfile
+    ports:
+      - '3001:3000'
