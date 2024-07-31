@@ -8,3 +8,4 @@ export * from './validate-queue.usecase';
 export * from './activate-queue-users.usecase';
 export * from './expire-queue-users.usecase';
 export * from './recharge-point.usecase';
+export * from './find-event-schedules.usecase';
