@@ -30,6 +30,16 @@ export class EventService {
     return this.scheduleRepository.findBetween({ startDate, endDate });
   }
 
+  async findSchedulesBetweenByEventId({
+    eventId,
+    between,
+  }: {
+    eventId: string;
+    between: { startDate: LocalDateTime; endDate: LocalDateTime };
+  }): Promise<Schedule[]> {
+    return this.scheduleRepository.findBetweenByEventId(eventId, between);
+  }
+
   async findAvailableSeats(scheduleId: string): Promise<Seat[]> {
     const schedule = await this.scheduleRepository.findById(scheduleId);
 

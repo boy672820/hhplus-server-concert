@@ -3,6 +3,7 @@ import {
   ActivateQueueUsersUseCase,
   ExpireQueueUsersUseCase,
   FindAvailableSeatsUseCase,
+  FindEventSchedulesUseCase,
   FindEventsUseCase,
   FindSchedulesBetweenUseCase,
   GenerateTokenUsecase,
@@ -23,4 +24,5 @@ export const usecases: Type<any>[] = [
   ActivateQueueUsersUseCase,
   ExpireQueueUsersUseCase,
   RechargePointUseCase,
+  FindEventSchedulesUseCase,
 ];
