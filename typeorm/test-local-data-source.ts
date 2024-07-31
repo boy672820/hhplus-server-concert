@@ -1,6 +1,6 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { SeederOptions } from 'typeorm-extension';
-import { config } from './test-config';
+import { config } from './test-local-config';
 import { join } from 'path';
 
 const options: DataSourceOptions & SeederOptions = {
@@ -12,7 +12,6 @@ const options: DataSourceOptions & SeederOptions = {
   port: config.database.port,
   migrationsTableName: 'typeorm_migrations',
   migrations: [join(__dirname, 'migrations/*{.ts,.js}')],
-  synchronize: false,
   seeds: ['typeorm/seeds/**/*{.ts,.js}'],
   factories: ['typeorm/factories/**/*{.ts,.js}'],
   entities: ['src/**/*.entity{.ts,.js}'],
