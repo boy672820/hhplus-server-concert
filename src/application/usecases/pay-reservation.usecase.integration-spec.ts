@@ -26,7 +26,7 @@ import { ReservationRepositoryImpl } from '../../infrastructure/repositories/res
 import { EventRepositoryImpl } from '../../infrastructure/repositories/event.repository';
 import { SeatRepositoryImpl } from '../../infrastructure/repositories/seat.repository';
 import { PointRepositoryImpl } from '../../infrastructure/repositories/point.repository';
-import { PaymentRepositoryImpl } from '../../infrastructure/repositories/payment.repositor';
+import { PaymentRepositoryImpl } from '../../infrastructure/repositories/payment.repository';
 import { QueueRepositoryImpl } from '../../infrastructure/repositories/queue.repository';
 
 describe('PayReservationUseCase (Integration)', () => {
