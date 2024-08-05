@@ -38,13 +38,20 @@ export class ScheduleRepositoryImpl implements ScheduleRepository {
     eventId: string,
     between: { startDate: LocalDateTime; endDate: LocalDateTime },
   ): Promise<Schedule[]> {
-    const entities = await this.dataSource.manager.find(ScheduleEntity, {
-      where: {
-        event: { id: eventId },
-        startDate: MoreThanOrEqual(between.startDate),
-        endDate: LessThanOrEqual(between.endDate),
-      },
-    });
+    const entities = await this.dataSource
+      .createQueryBuilder(ScheduleEntity, 'schedule')
+      .select(['id', 'startDate', 'endDate'])
+      .where('schedule.eventId = :eventId', { eventId })
+      .andWhere('schedule.startDate >= :startDate')
+      .andWhere('schedule.endDate <= :endDate')
+      // .andWhere('schedule.status >= :status')
+      .setParameters({
+        eventId,
+        startDate: between.startDate.toDate('Asia/Seoul'),
+        endDate: between.endDate.toDate('Asia/Seoul'),
+        // status: ScheduleStatus.Active,
+      })
+      .getRawMany();
     return entities.map(ScheduleMapper.toModel);
   }
 }
