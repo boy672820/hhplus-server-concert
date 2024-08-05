@@ -32,6 +32,7 @@ import { OptimisticLockingSubscriber } from './optimistic-locking.subscriber';
         migrations: [join(__dirname, '/../../typeorm/migrations/*{.ts,.js}')],
         subscribers: [OptimisticLockingSubscriber],
         logging: appConfig.nodeEnv === 'debug',
+        maxQueryExecutionTime: 100,
       }),
       inject: [AppConfigService, DatabaseConfigService],
       dataSourceFactory: async (options: DataSourceOptions) => {
