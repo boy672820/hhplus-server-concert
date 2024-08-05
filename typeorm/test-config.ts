@@ -14,13 +14,11 @@ interface Config {
 
 export const config: Config = {
   database: {
-    type: (process.env.DATABASE_TYPE as 'mysql') || 'mysql',
-    name: process.env.DATABASE_NAME || 'concert',
-    username: process.env.DATABASE_USERNAME || 'concert',
-    password: process.env.DATABASE_PASSWORD || '123',
-    host: process.env.DATABASE_HOST || 'localhost',
-    port: process.env.DATABASE_PORT
-      ? parseInt(process.env.DATABASE_PORT)
-      : 3306,
+    type: 'mysql',
+    name: 'concert',
+    username: 'concert',
+    password: '123',
+    host: 'localhost',
+    port: 3302,
   },
 };

@@ -21,23 +21,15 @@ const eventEndDate = LocalDateTime.of(
   endTime,
 );
 
-const createStartDate = (added: number = 0): LocalDateTime =>
+const createStartDate = (): LocalDateTime =>
   LocalDateTime.of(
-    LocalDate.of(
-      localDate.year(),
-      localDate.month(),
-      localDate.dayOfMonth() + added,
-    ),
+    LocalDate.of(localDate.year(), localDate.month(), 1),
     startTime,
   );
 
-const createEndDate = (added: number = 0): LocalDateTime =>
+const createEndDate = (): LocalDateTime =>
   LocalDateTime.of(
-    LocalDate.of(
-      localDate.year(),
-      localDate.month(),
-      localDate.dayOfMonth() + added,
-    ),
+    LocalDate.of(localDate.year(), localDate.month(), 1).plusMonths(1),
     endTime,
   );
 
@@ -52,14 +44,11 @@ const createEvent = (): EventEntity =>
     updatedDate: now,
   });
 
-const createSchedule = (
-  event: EventEntity,
-  added: number = 0,
-): ScheduleEntity =>
+const createSchedule = (event: EventEntity): ScheduleEntity =>
   ScheduleEntity.of({
     id: ulid(),
-    startDate: createStartDate(added),
-    endDate: createEndDate(added),
+    startDate: createStartDate(),
+    endDate: createEndDate(),
     event: event,
   });
 
@@ -76,12 +65,13 @@ const createSeat = (
     price,
   });
 
-export const events: EventEntity[] = Array.from({ length: 5 }, () =>
+// 인터파크의 총 상품 수는 278개입니다. (2024.07.31 기준)
+export const events: EventEntity[] = Array.from({ length: 277 }, () =>
   createEvent(),
 );
 
 export const schedules: ScheduleEntity[] = events.flatMap((event) =>
-  Array.from({ length: 5 }, (_, j) => createSchedule(event, j)),
+  Array.from({ length: 5 }, () => createSchedule(event)),
 );
 
 export const seats: SeatEntity[] = schedules.flatMap((schedule) =>

@@ -87,6 +87,8 @@ export class Queue implements Props {
   }
 
   expire(): void {
-    this.status = QueueStatus.Expired;
+    if (this.expiresDate.isBeforeNow()) {
+      this.status = QueueStatus.Expired;
+    }
   }
 }

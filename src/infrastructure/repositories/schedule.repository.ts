@@ -33,4 +33,18 @@ export class ScheduleRepositoryImpl implements ScheduleRepository {
     });
     return entities.map(ScheduleMapper.toModel);
   }
+
+  async findBetweenByEventId(
+    eventId: string,
+    between: { startDate: LocalDateTime; endDate: LocalDateTime },
+  ): Promise<Schedule[]> {
+    const entities = await this.dataSource.manager.find(ScheduleEntity, {
+      where: {
+        event: { id: eventId },
+        startDate: MoreThanOrEqual(between.startDate),
+        endDate: LessThanOrEqual(between.endDate),
+      },
+    });
+    return entities.map(ScheduleMapper.toModel);
+  }
 }
