@@ -1,6 +1,13 @@
 import { SeatStatus } from '@lib/types';
 import { ColumnMoney, ColumnUlid, PrimaryUlid } from '@lib/decorators';
-import { Column, Entity, JoinColumn, ManyToOne, VersionColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  VersionColumn,
+} from 'typeorm';
 import Decimal from 'decimal.js';
 import { ScheduleEntity } from './schedule.entity';
 
@@ -15,6 +22,7 @@ interface Seat {
 }
 
 @Entity('seat')
+@Index(['schedule', 'status'])
 export class SeatEntity implements Seat {
   @PrimaryUlid()
   id: string;
