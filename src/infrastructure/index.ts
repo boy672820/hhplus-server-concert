@@ -14,7 +14,7 @@ import { EventRepositoryImpl } from './repositories/event.repository';
 import { ScheduleRepositoryImpl } from './repositories/schedule.repository';
 import { SeatRepositoryImpl } from './repositories/seat.repository';
 import { ReservationRepositoryImpl } from './repositories/reservation.repository';
-import { PaymentRepositoryImpl } from './repositories/payment.repositor';
+import { PaymentRepositoryImpl } from './repositories/payment.repository';
 
 export const repositories: Provider[] = [
   {
