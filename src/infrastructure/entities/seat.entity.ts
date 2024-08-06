@@ -39,10 +39,13 @@ export class SeatEntity implements Seat {
   @ColumnMoney()
   price: Decimal;
 
+  @ColumnUlid()
+  scheduleId: string;
+
   @ManyToOne(() => ScheduleEntity, {
+    eager: true,
     nullable: false,
     cascade: true,
-    eager: true,
   })
   @JoinColumn({ name: 'scheduleId' })
   schedule: ScheduleEntity;
