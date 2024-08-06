@@ -1,14 +1,18 @@
-import { LocalDateTime } from '@lib/types';
 import { DomainError } from '@lib/errors';
 import { Injectable } from '@nestjs/common';
 import { Reservation } from '../models';
-import { EventRepository, ReservationRepository } from '../repositories';
+import {
+  EventRepository,
+  ReservationRepository,
+  ScheduleRepository,
+} from '../repositories';
 import Decimal from 'decimal.js';
 
 @Injectable()
 export class ReservationService {
   constructor(
     private readonly reservationRepository: ReservationRepository,
+    private readonly scheduleRepository: ScheduleRepository,
     private readonly eventRepository: EventRepository,
   ) {}
 
@@ -18,21 +22,25 @@ export class ReservationService {
     seatNumber,
     price,
     eventId,
-    scheduleStartDate,
-    scheduleEndDate,
+    scheduleId,
   }: {
     userId: string;
     seatId: string;
     seatNumber: number;
     price: Decimal;
     eventId: string;
-    scheduleStartDate: LocalDateTime;
-    scheduleEndDate: LocalDateTime;
+    scheduleId: string;
   }): Promise<Reservation> {
     const event = await this.eventRepository.findById(eventId);
 
     if (!event) {
       throw DomainError.notFound('이벤트를 찾을 수 없습니다.');
+    }
+
+    const schedule = await this.scheduleRepository.findById(scheduleId);
+
+    if (!schedule) {
+      throw DomainError.notFound('스케줄을 찾을 수 없습니다.');
     }
 
     const reservation = Reservation.create({
@@ -45,8 +53,8 @@ export class ReservationService {
       eventAddress: event.address,
       eventStartDate: event.startDate,
       eventEndDate: event.endDate,
-      scheduleStartDate,
-      scheduleEndDate,
+      scheduleStartDate: schedule.startDate,
+      scheduleEndDate: schedule.endDate,
     });
     await this.reservationRepository.save(reservation);
     return reservation;
