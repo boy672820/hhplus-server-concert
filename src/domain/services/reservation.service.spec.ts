@@ -1,14 +1,22 @@
 import { LocalDateTime } from '@lib/types';
 import { mock, MockProxy } from 'jest-mock-extended';
-import { EventRepository, ReservationRepository } from '../repositories';
+import {
+  EventRepository,
+  ReservationRepository,
+  ScheduleRepository,
+} from '../repositories';
 import { ReservationService } from './reservation.service';
-import { Event, Reservation } from '../models';
+import { Event, Reservation, Schedule } from '../models';
 import Decimal from 'decimal.js';
 import { DomainError } from '../../lib/errors';
 
 const event = Event.create({
   title: 'event-title',
   address: 'event-address',
+  startDate: LocalDateTime.now(),
+  endDate: LocalDateTime.now(),
+});
+const schedule = Schedule.create({
   startDate: LocalDateTime.now(),
   endDate: LocalDateTime.now(),
 });
@@ -29,14 +37,21 @@ const reservation = Reservation.create({
 describe('ReservationService', () => {
   let reservationRepository: MockProxy<ReservationRepository>;
   let eventRepository: MockProxy<EventRepository>;
+  let scheduleRepository: MockProxy<ScheduleRepository>;
   let service: ReservationService;
 
   beforeEach(() => {
     reservationRepository = mock<ReservationRepository>();
     eventRepository = mock<EventRepository>();
-    service = new ReservationService(reservationRepository, eventRepository);
+    scheduleRepository = mock<ScheduleRepository>();
+    service = new ReservationService(
+      reservationRepository,
+      scheduleRepository,
+      eventRepository,
+    );
 
     eventRepository.findById.mockResolvedValue(event);
+    scheduleRepository.findById.mockResolvedValue(schedule);
     reservationRepository.findById.mockResolvedValue(reservation);
   });
 
@@ -47,8 +62,7 @@ describe('ReservationService', () => {
       const seatNumber = 1;
       const price = new Decimal(10000);
       const eventId = 'event-id';
-      const scheduleStartDate = LocalDateTime.now();
-      const scheduleEndDate = LocalDateTime.now();
+      const scheduleId = 'schedule-id';
 
       const result = await service.create({
         userId,
@@ -56,8 +70,7 @@ describe('ReservationService', () => {
         seatNumber,
         price,
         eventId,
-        scheduleStartDate,
-        scheduleEndDate,
+        scheduleId,
       });
 
       expect(result).toBeInstanceOf(Reservation);
@@ -71,8 +84,7 @@ describe('ReservationService', () => {
         const seatNumber = 1;
         const price = new Decimal(10000);
         const eventId = 'event-id';
-        const scheduleStartDate = LocalDateTime.now();
-        const scheduleEndDate = LocalDateTime.now();
+        const scheduleId = 'schedule-id';
         eventRepository.findById.mockResolvedValueOnce(null);
 
         expect(
@@ -82,8 +94,28 @@ describe('ReservationService', () => {
             seatNumber,
             price,
             eventId,
-            scheduleStartDate,
-            scheduleEndDate,
+            scheduleId,
+          }),
+        ).rejects.toThrow();
+      });
+
+      it('스케줄을 찾을 수 없는 경우', () => {
+        const userId = 'user-id';
+        const seatId = 'seat-id';
+        const seatNumber = 1;
+        const price = new Decimal(10000);
+        const eventId = 'event-id';
+        const scheduleId = 'schedule-id';
+        scheduleRepository.findById.mockResolvedValueOnce(null);
+
+        expect(
+          service.create({
+            userId,
+            seatId,
+            seatNumber,
+            price,
+            eventId,
+            scheduleId,
           }),
         ).rejects.toThrow();
       });

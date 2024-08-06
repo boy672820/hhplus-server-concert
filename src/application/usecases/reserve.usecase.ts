@@ -25,8 +25,7 @@ export class ReserveUseCase {
       seatNumber: seat.number,
       price: seat.price,
       eventId: seat.eventId,
-      scheduleStartDate: seat.scheduleStartDate,
-      scheduleEndDate: seat.scheduleEndDate,
+      scheduleId: seat.scheduleId,
     });
     return reservation;
   }
