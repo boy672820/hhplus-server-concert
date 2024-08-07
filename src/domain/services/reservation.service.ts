@@ -1,54 +1,59 @@
 import { DomainError } from '@lib/errors';
 import { Injectable } from '@nestjs/common';
 import { Reservation } from '../models';
+import { ReservationFactory } from '../factories/reservation.factory';
 import {
   EventRepository,
   ReservationRepository,
   ScheduleRepository,
+  SeatRepository,
 } from '../repositories';
-import Decimal from 'decimal.js';
 
 @Injectable()
 export class ReservationService {
   constructor(
+    private readonly reservationFactory: ReservationFactory,
     private readonly reservationRepository: ReservationRepository,
-    private readonly scheduleRepository: ScheduleRepository,
     private readonly eventRepository: EventRepository,
+    private readonly scheduleRepository: ScheduleRepository,
+    private readonly seatRepository: SeatRepository,
   ) {}
 
   async create({
     userId,
     seatId,
-    seatNumber,
-    price,
-    eventId,
-    scheduleId,
   }: {
     userId: string;
     seatId: string;
-    seatNumber: number;
-    price: Decimal;
-    eventId: string;
-    scheduleId: string;
   }): Promise<Reservation> {
-    const event = await this.eventRepository.findById(eventId);
+    const seat = await this.seatRepository.findById(seatId);
+
+    if (!seat) {
+      throw DomainError.notFound('좌석을 찾을 수 없습니다.');
+    }
+
+    if (seat.isNotAvailable()) {
+      throw DomainError.conflict('이미 예약된 좌석입니다.');
+    }
+
+    const event = await this.eventRepository.findById(seat.eventId);
 
     if (!event) {
       throw DomainError.notFound('이벤트를 찾을 수 없습니다.');
     }
 
-    const schedule = await this.scheduleRepository.findById(scheduleId);
+    const schedule = await this.scheduleRepository.findById(seat.scheduleId);
 
     if (!schedule) {
       throw DomainError.notFound('스케줄을 찾을 수 없습니다.');
     }
 
-    const reservation = Reservation.create({
+    const reservation = this.reservationFactory.create({
       userId,
       seatId,
-      seatNumber,
-      price,
-      eventId,
+      seatNumber: seat.number,
+      price: seat.price,
+      eventId: seat.eventId,
       eventTitle: event.title,
       eventAddress: event.address,
       eventStartDate: event.startDate,
@@ -56,7 +61,12 @@ export class ReservationService {
       scheduleStartDate: schedule.startDate,
       scheduleEndDate: schedule.endDate,
     });
+
     await this.reservationRepository.save(reservation);
+
+    reservation.reserveSeat(seatId);
+    reservation.commit();
+
     return reservation;
   }
 
@@ -79,5 +89,16 @@ export class ReservationService {
     await this.reservationRepository.save(reservation);
 
     return reservation;
+  }
+
+  async cancel(reservationId: string): Promise<void> {
+    const reservation =
+      await this.reservationRepository.findById(reservationId);
+
+    if (!reservation) {
+      throw DomainError.notFound('예약을 찾을 수 없습니다.');
+    }
+
+    await this.reservationRepository.remove(reservation);
   }
 }

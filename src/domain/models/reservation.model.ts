@@ -2,6 +2,8 @@ import { LocalDateTime, ReservationStatus } from '@lib/types';
 import { DomainError } from '@lib/errors';
 import Decimal from 'decimal.js';
 import { ulid } from 'ulid';
+import { AggregateRoot } from '@nestjs/cqrs';
+import { ReservationReservedSeatEvent } from '../events';
 
 interface Props {
   id: string;
@@ -22,7 +24,22 @@ interface Props {
   createdDate: LocalDateTime;
 }
 
-export class Reservation implements Props {
+export type ReservationCreateProps = Pick<
+  Props,
+  | 'userId'
+  | 'eventId'
+  | 'eventTitle'
+  | 'eventAddress'
+  | 'eventStartDate'
+  | 'eventEndDate'
+  | 'seatId'
+  | 'seatNumber'
+  | 'price'
+  | 'scheduleStartDate'
+  | 'scheduleEndDate'
+>;
+
+export class Reservation extends AggregateRoot implements Props {
   id: string;
   userId: string;
   eventId: string;
@@ -41,25 +58,11 @@ export class Reservation implements Props {
   createdDate: LocalDateTime;
 
   private constructor(props: Props) {
+    super();
     Object.assign(this, props);
   }
 
-  static create = (
-    props: Pick<
-      Props,
-      | 'userId'
-      | 'eventId'
-      | 'eventTitle'
-      | 'eventAddress'
-      | 'eventStartDate'
-      | 'eventEndDate'
-      | 'seatId'
-      | 'seatNumber'
-      | 'price'
-      | 'scheduleStartDate'
-      | 'scheduleEndDate'
-    >,
-  ): Reservation =>
+  static create = (props: ReservationCreateProps): Reservation =>
     new Reservation({
       ...props,
       id: ulid(),
@@ -70,6 +73,10 @@ export class Reservation implements Props {
     });
 
   static from = (props: Props): Reservation => new Reservation(props);
+
+  reserveSeat(seatId: string): void {
+    this.apply(new ReservationReservedSeatEvent(seatId, this.id));
+  }
 
   pay(userId: string): void {
     if (this.status === ReservationStatus.Paid) {
