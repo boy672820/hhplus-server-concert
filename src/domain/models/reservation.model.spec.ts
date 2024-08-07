@@ -2,6 +2,7 @@ import { LocalDateTime, ReservationStatus } from '@lib/types';
 import { DomainError } from '@lib/errors';
 import Decimal from 'decimal.js';
 import { Reservation } from './reservation.model';
+import { ReservationReservedSeatEvent } from '../events';
 
 describe('Reservation', () => {
   let reservation: Reservation;
@@ -19,6 +20,19 @@ describe('Reservation', () => {
       eventEndDate: LocalDateTime.now(),
       scheduleStartDate: LocalDateTime.now(),
       scheduleEndDate: LocalDateTime.now(),
+    });
+
+    jest.spyOn(reservation, 'apply').mockImplementation(() => {});
+  });
+
+  describe('좌석 예약', () => {
+    it('좌석을 예약합니다.', () => {
+      const seatId = '1';
+      const event = new ReservationReservedSeatEvent(seatId);
+
+      reservation.reserveSeat(seatId);
+
+      expect(reservation.apply).toHaveBeenCalledWith(event);
     });
   });
 

@@ -3,6 +3,7 @@ import { RedisModule } from '@lib/redis';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { CqrsModule } from '@nestjs/cqrs';
 import { ScheduleModule } from '@nestjs/schedule';
 import { validate } from './env.validator';
 import { DomainExceptionFilter } from './domain-exception.filter';
@@ -11,6 +12,7 @@ import { LoggingModule } from './logging.module';
 
 @Module({
   imports: [
+    CqrsModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
@@ -31,6 +33,6 @@ import { LoggingModule } from './logging.module';
       useClass: LoggingInterceptor,
     },
   ],
-  exports: [RedisModule],
+  exports: [RedisModule, CqrsModule],
 })
 export class CoreModule {}
