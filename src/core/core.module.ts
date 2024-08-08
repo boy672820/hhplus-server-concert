@@ -9,6 +9,7 @@ import { validate } from './env.validator';
 import { DomainExceptionFilter } from './domain-exception.filter';
 import { LoggingInterceptor } from './logging.interceptor';
 import { LoggingModule } from './logging.module';
+import { MockApiModule } from '../lib/mock';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { LoggingModule } from './logging.module';
     DatabaseModule,
     RedisModule,
     LoggingModule,
+    MockApiModule,
   ],
   providers: [
     {
@@ -33,6 +35,6 @@ import { LoggingModule } from './logging.module';
       useClass: LoggingInterceptor,
     },
   ],
-  exports: [RedisModule, CqrsModule],
+  exports: [RedisModule, CqrsModule, MockApiModule],
 })
 export class CoreModule {}
