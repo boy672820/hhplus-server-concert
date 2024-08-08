@@ -9,13 +9,16 @@ import { ReservationDetailEntity } from '../entities/reservation-detail.entity';
 
 @Injectable()
 export class ReservationRepositoryImpl implements ReservationRepository {
-  constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
+  constructor(
+    @InjectDataSource() private readonly dataSource: DataSource,
+    private readonly mapper: ReservationMapper,
+  ) {}
 
   async findById(id: string): Promise<Reservation | null> {
     const entity = await this.dataSource.manager.findOneBy(ReservationEntity, {
       id,
     });
-    return entity ? ReservationMapper.toModel(entity) : null;
+    return entity ? this.mapper.toModel(entity) : null;
   }
 
   async save(reservation: Reservation): Promise<void> {

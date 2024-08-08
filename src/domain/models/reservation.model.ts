@@ -3,9 +3,9 @@ import { DomainError } from '@lib/errors';
 import Decimal from 'decimal.js';
 import { ulid } from 'ulid';
 import { AggregateRoot } from '@nestjs/cqrs';
-import { ReservationReservedSeatEvent } from '../events';
+import { ReservationPaidEvent, ReservationReservedSeatEvent } from '../events';
 
-interface Props {
+export interface ReservationProps {
   id: string;
   userId: string;
   eventId: string;
@@ -25,7 +25,7 @@ interface Props {
 }
 
 export type ReservationCreateProps = Pick<
-  Props,
+  ReservationProps,
   | 'userId'
   | 'eventId'
   | 'eventTitle'
@@ -39,7 +39,7 @@ export type ReservationCreateProps = Pick<
   | 'scheduleEndDate'
 >;
 
-export class Reservation extends AggregateRoot implements Props {
+export class Reservation extends AggregateRoot implements ReservationProps {
   id: string;
   userId: string;
   eventId: string;
@@ -57,7 +57,7 @@ export class Reservation extends AggregateRoot implements Props {
   expiresDate: LocalDateTime | null;
   createdDate: LocalDateTime;
 
-  private constructor(props: Props) {
+  private constructor(props: ReservationProps) {
     super();
     Object.assign(this, props);
   }
@@ -72,7 +72,8 @@ export class Reservation extends AggregateRoot implements Props {
       createdDate: LocalDateTime.now(),
     });
 
-  static from = (props: Props): Reservation => new Reservation(props);
+  static from = (props: ReservationProps): Reservation =>
+    new Reservation(props);
 
   reserveSeat(seatId: string): void {
     this.apply(new ReservationReservedSeatEvent(seatId, this.id));
@@ -88,5 +89,9 @@ export class Reservation extends AggregateRoot implements Props {
     }
 
     this.status = ReservationStatus.Paid;
+
+    this.apply(
+      new ReservationPaidEvent(this.id, this.seatId, this.price.toString()),
+    );
   }
 }

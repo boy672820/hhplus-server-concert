@@ -15,6 +15,7 @@ import {
 import { ReserveSeatHandler } from './commands/reserve-seat.handler';
 import { ReservationReservedSeatHandler } from './events/reservation-reserved-seat.handler';
 import { ReservationCancelledHandler } from './events/reservation-cancelled.handler';
+import { ReservationPaidHandler } from './events/reservation-paid.handler';
 import { CancelReservationHandler } from './commands/cancel-reservation.handler';
 import { ReservationSagas } from './sagas/reservation.saga';
 
@@ -40,6 +41,7 @@ export const commands: Type<any>[] = [
 export const events: Type<any>[] = [
   ReservationReservedSeatHandler,
   ReservationCancelledHandler,
+  ReservationPaidHandler,
 ];
 
 export const sagas: Type<any>[] = [ReservationSagas];
