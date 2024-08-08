@@ -88,6 +88,8 @@ export class ReservationService {
 
     await this.reservationRepository.save(reservation);
 
+    reservation.commit();
+
     return reservation;
   }
 
