@@ -1,16 +1,16 @@
-import { Injectable } from '@nestjs/common';
-import { Transactional } from 'typeorm-transactional';
-import { ReservationService, SeatService } from '../../domain/services';
+import { Inject, Injectable } from '@nestjs/common';
+import { Logger } from 'winston';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { ReservationService } from '../../domain/services';
 import { Reservation } from '../../domain/models';
 
 @Injectable()
 export class ReserveUseCase {
   constructor(
-    private readonly seatService: SeatService,
     private readonly reservationService: ReservationService,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
-  @Transactional()
   async execute({
     userId,
     seatId,
@@ -18,16 +18,11 @@ export class ReserveUseCase {
     userId: string;
     seatId: string;
   }): Promise<Reservation> {
-    const seat = await this.seatService.temporarilyReserve(seatId);
     const reservation = await this.reservationService.create({
       userId,
-      seatId: seat.id,
-      seatNumber: seat.number,
-      price: seat.price,
-      eventId: seat.eventId,
-      scheduleStartDate: seat.scheduleStartDate,
-      scheduleEndDate: seat.scheduleEndDate,
+      seatId,
     });
+    this.logger.info(`[예약 생성] 예약 ID: ${reservation.id}`);
     return reservation;
   }
 }

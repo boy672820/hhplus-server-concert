@@ -15,6 +15,7 @@ import { ScheduleRepositoryImpl } from './repositories/schedule.repository';
 import { SeatRepositoryImpl } from './repositories/seat.repository';
 import { ReservationRepositoryImpl } from './repositories/reservation.repository';
 import { PaymentRepositoryImpl } from './repositories/payment.repository';
+import { ReservationMapper } from './mappers/reservation.mapper';
 
 export const repositories: Provider[] = [
   {
@@ -46,3 +47,5 @@ export const repositories: Provider[] = [
     useClass: PaymentRepositoryImpl,
   },
 ];
+
+export const mappers: Provider[] = [ReservationMapper];

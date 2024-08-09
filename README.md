@@ -34,6 +34,9 @@
 
  - [API 명세서](./docs/api-spec.md)
  - [동시성 문제 분석](docs/concurrency-problems.md)
+ - [성능 개선](docs/performance.md)
+ - [쿼리 성능 개선(Query Optimization)](docs/query-optimization.md)
+ - [MSA 설계](docs/msa.md)
 
 ## 목차
 

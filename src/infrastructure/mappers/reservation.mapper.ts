@@ -1,10 +1,15 @@
 import { Reservation } from '../../domain/models';
+import { ReservationFactory } from '../../domain/factories/reservation.factory';
 import { ReservationEntity } from '../entities/reservation.entity';
 import { SeatEntity } from '../entities/seat.entity';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class ReservationMapper {
-  static toModel = (entity: ReservationEntity): Reservation =>
-    Reservation.from({
+  constructor(private readonly reservationFactory: ReservationFactory) {}
+
+  toModel = (entity: ReservationEntity): Reservation =>
+    this.reservationFactory.reconstitute({
       id: entity.id,
       userId: entity.userId,
       eventId: entity.eventId,

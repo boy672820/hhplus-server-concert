@@ -1,4 +1,4 @@
-import { LocalDateTime, SeatStatus } from '@lib/types';
+import { SeatStatus } from '@lib/types';
 import { DomainError } from '@lib/errors';
 import { ulid } from 'ulid';
 import Decimal from 'decimal.js';
@@ -7,8 +7,6 @@ export interface SeatProps {
   id: string;
   eventId: string;
   scheduleId: string;
-  scheduleStartDate: LocalDateTime;
-  scheduleEndDate: LocalDateTime;
   number: number;
   status: SeatStatus;
   price: Decimal;
@@ -19,8 +17,6 @@ export class Seat implements SeatProps {
   id: string;
   eventId: string;
   scheduleId: string;
-  scheduleStartDate: LocalDateTime;
-  scheduleEndDate: LocalDateTime;
   number: number;
   status: SeatStatus;
   price: Decimal;
@@ -31,15 +27,7 @@ export class Seat implements SeatProps {
   }
 
   static create = (
-    props: Pick<
-      SeatProps,
-      | 'scheduleId'
-      | 'scheduleStartDate'
-      | 'scheduleEndDate'
-      | 'eventId'
-      | 'number'
-      | 'price'
-    >,
+    props: Pick<SeatProps, 'scheduleId' | 'eventId' | 'number' | 'price'>,
   ): Seat =>
     new Seat({ ...props, id: ulid(), status: SeatStatus.Pending, version: 0 });
 

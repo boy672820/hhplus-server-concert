@@ -1,4 +1,3 @@
-import { LocalDateTime } from '@lib/types';
 import { DomainError } from '@lib/errors';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { Seat } from '../models';
@@ -17,8 +16,6 @@ describe('SeatService', () => {
       number: 1,
       price: new Decimal(10000),
       scheduleId: '1',
-      scheduleStartDate: LocalDateTime.now(),
-      scheduleEndDate: LocalDateTime.now(),
     });
     seatRepository = mock<SeatRepository>();
     service = new SeatService(seatRepository);

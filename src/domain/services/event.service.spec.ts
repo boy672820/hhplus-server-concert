@@ -58,6 +58,7 @@ describe('EventService', () => {
 
     eventRepository.findAll.mockResolvedValue([event]);
     scheduleRepository.findBetween.mockResolvedValue([schedule]);
+    scheduleRepository.findBetweenByEventId.mockResolvedValue([schedule]);
     scheduleRepository.findById.mockResolvedValue(schedule);
     seatRepository.findAvailables.mockResolvedValue([seat]);
   });
@@ -71,10 +72,28 @@ describe('EventService', () => {
   });
 
   describe('예약 가능한 날짜 조회', () => {
-    it('특정 콘서트의 예약 가능한 날짜를 조회합니다.', async () => {
+    it('예약 가능한 날짜를 조회합니다.', async () => {
       const result = await eventService.findSchedulesBetween({
         startDate: LocalDateTime.now(),
         endDate: LocalDateTime.now(),
+      });
+
+      expect(result).toEqual([schedule]);
+    });
+  });
+
+  describe('이벤트의 스케줄 조회', () => {
+    it('특정 이벤트의 스케줄을 조회합니다.', async () => {
+      const eventId = '1';
+      const startDate = LocalDateTime.now();
+      const endDate = LocalDateTime.now();
+
+      const result = await eventService.findSchedulesBetweenByEventId({
+        eventId,
+        between: {
+          startDate,
+          endDate,
+        },
       });
 
       expect(result).toEqual([schedule]);
