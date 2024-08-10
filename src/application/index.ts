@@ -12,6 +12,12 @@ import {
   ReserveUseCase,
   ValidateQueueUseCase,
 } from './usecases';
+import { ReserveSeatHandler } from './commands/reserve-seat.handler';
+import { ReservationReservedSeatHandler } from './events/reservation-reserved-seat.handler';
+import { ReservationCancelledHandler } from './events/reservation-cancelled.handler';
+import { ReservationPaidHandler } from './events/reservation-paid.handler';
+import { CancelReservationHandler } from './commands/cancel-reservation.handler';
+import { ReservationSagas } from './sagas/reservation.saga';
 
 export const usecases: Type<any>[] = [
   GenerateTokenUsecase,
@@ -26,3 +32,16 @@ export const usecases: Type<any>[] = [
   RechargePointUseCase,
   FindEventSchedulesUseCase,
 ];
+
+export const commands: Type<any>[] = [
+  ReserveSeatHandler,
+  CancelReservationHandler,
+];
+
+export const events: Type<any>[] = [
+  ReservationReservedSeatHandler,
+  ReservationCancelledHandler,
+  ReservationPaidHandler,
+];
+
+export const sagas: Type<any>[] = [ReservationSagas];

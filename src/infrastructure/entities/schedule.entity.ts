@@ -1,6 +1,6 @@
-import { LocalDateTime } from '@lib/types';
+import { LocalDateTime, ScheduleStatus } from '@lib/types';
 import { ColumnDatetime, PrimaryUlid } from '@lib/decorators';
-import { Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
 import { EventEntity } from './event.entity';
 
 interface Schedule {
@@ -11,7 +11,7 @@ interface Schedule {
 }
 
 @Entity('schedule')
-@Index(['startDate', 'endDate'])
+@Index(['event', 'startDate', 'endDate', 'id'])
 export class ScheduleEntity {
   @PrimaryUlid()
   id: string;
@@ -21,6 +21,13 @@ export class ScheduleEntity {
 
   @ColumnDatetime()
   endDate: LocalDateTime;
+
+  @Column({
+    type: 'enum',
+    enum: ScheduleStatus,
+    default: ScheduleStatus.Active,
+  })
+  status: ScheduleStatus;
 
   @ManyToOne(() => EventEntity, { cascade: true, nullable: false })
   @JoinColumn({ name: 'eventId' })
