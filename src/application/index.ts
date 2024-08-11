@@ -6,10 +6,10 @@ import {
   FindEventSchedulesUseCase,
   FindEventsUseCase,
   FindSchedulesBetweenUseCase,
-  GenerateTokenUsecase,
   PayReservationUseCase,
   RechargePointUseCase,
   ReserveUseCase,
+  SignQueueUserUseCase,
   ValidateQueueUseCase,
 } from './usecases';
 import { ReserveSeatHandler } from './commands/reserve-seat.handler';
@@ -20,7 +20,6 @@ import { CancelReservationHandler } from './commands/cancel-reservation.handler'
 import { ReservationSagas } from './sagas/reservation.saga';
 
 export const usecases: Type<any>[] = [
-  GenerateTokenUsecase,
   FindEventsUseCase,
   FindSchedulesBetweenUseCase,
   FindAvailableSeatsUseCase,
@@ -31,6 +30,7 @@ export const usecases: Type<any>[] = [
   ExpireQueueUsersUseCase,
   RechargePointUseCase,
   FindEventSchedulesUseCase,
+  SignQueueUserUseCase,
 ];
 
 export const commands: Type<any>[] = [

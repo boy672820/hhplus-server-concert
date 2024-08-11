@@ -1,16 +1,7 @@
-import { LocalDateTime, QueueStatus } from '@lib/types';
-import { DomainError } from '@lib/errors';
 import { mock, MockProxy } from 'jest-mock-extended';
-import { QueueRepository } from '../repositories';
 import { QueueService } from './queue.service';
-import { Queue } from '../models';
-
-const queue = Queue.from({
-  userId: '1',
-  sequence: 1,
-  status: QueueStatus.Active,
-  expiresDate: LocalDateTime.now().plusMinutes(5),
-});
+import { QueueRepository } from '../repositories';
+import { QueueUser } from '../models';
 
 describe('QueueService', () => {
   let service: QueueService;
@@ -20,107 +11,91 @@ describe('QueueService', () => {
     queueRepository = mock<QueueRepository>();
     service = new QueueService(queueRepository);
 
-    queueRepository.create.mockResolvedValue(queue);
-    queueRepository.findLastestByUserId.mockResolvedValue(queue);
+    queueRepository.enqueue.mockResolvedValue();
   });
 
-  describe('대기열 토큰 생성', () => {
-    it('대기열 토큰을 생성합니다.', async () => {
-      const userId = '1';
+  describe('대기열 입장', () => {
+    it('대기열에 사용자를 추가합니다.', async () => {
+      const userId = 'user-id';
 
-      const result = await service.enqueue(userId);
+      const result = await service.enterUser(userId);
 
-      expect(result).toEqual(queue);
-    });
-  });
-
-  describe('대기열 토큰 파싱', () => {
-    it('대기열 토큰을 파싱합니다.', () => {
-      const token = queue.sign();
-
-      const result = service.parse(token);
-
-      expect(result).toBeInstanceOf(Queue);
+      expect(result).toBeInstanceOf(QueueUser);
+      expect(queueRepository.enqueue).toHaveBeenCalled();
     });
   });
 
-  describe('대기열 토큰 검증', () => {
-    it('대기열 토큰을 검증합니다.', async () => {
-      const result = await service.verify(queue);
+  describe('토큰 서명', () => {
+    it('토큰을 서명합니다.', () => {
+      const queue = QueueUser.createWaiting({ userId: '1' });
 
-      expect(result).toBeInstanceOf(Queue);
-    });
+      const result = service.sign(queue);
 
-    describe('다음의 경우 검증에 실패합니다.', () => {
-      it('사용자를 찾을 수 없을 경우', async () => {
-        queueRepository.findLastestByUserId.mockResolvedValue(null);
-
-        await expect(service.verify(queue)).rejects.toThrow(
-          DomainError.notFound('사용자를 찾을 수 없습니다.'),
-        );
-      });
+      expect(result).toBe(queue.sign());
     });
   });
 
-  describe('대기열 토큰 만료', () => {
-    it('대기열 토큰을 만료시킵니다.', async () => {
-      const spyOnExpire = jest.spyOn(queue, 'expire');
+  describe('토큰 검증', () => {
+    it('토큰을 검증합니다.', async () => {
+      const token = QueueUser.createActive({ userId: '1' }).sign();
 
-      await service.expire(queue.userId);
+      const result = await service.verifyToken(token);
 
-      expect(spyOnExpire).toHaveBeenCalled();
-      expect(queueRepository.save).toHaveBeenCalledWith(queue);
-    });
-
-    describe('다음의 경우 만료에 실패합니다.', () => {
-      it('사용자를 찾을 수 없을 경우', async () => {
-        queueRepository.findLastestByUserId.mockResolvedValue(null);
-
-        await expect(service.expire(queue.userId)).rejects.toThrow(
-          DomainError.notFound('사용자를 찾을 수 없습니다.'),
-        );
-      });
+      const expected = QueueUser.parse(token);
+      expect(result.userId).toEqual(expected.userId);
+      expect(result.expiresDate.toEqual(expected.expiresDate)).toBeTruthy();
     });
   });
 
-  describe('대기중인 사용자 활성화', () => {
-    it('대기중인 사용자를 활성화합니다.', async () => {
-      const activeCount = 0;
-      const users = [queue];
-      const spyOnActivate = jest.spyOn(queue, 'activate');
+  describe('활성 사용자 확인', () => {
+    it('활성 사용자를 확인합니다.', async () => {
+      const userId = 'user-id';
+      const user = QueueUser.createActive({ userId });
+      queueRepository.getActiveUser.mockResolvedValueOnce(user);
 
-      queueRepository.getActiveCount.mockResolvedValueOnce(activeCount);
-      queueRepository.findWaitingUsersByLimit.mockResolvedValueOnce(users);
+      const result = await service.checkActive(userId);
 
-      await service.activateQueueUsers();
-
-      expect(spyOnActivate).toHaveBeenCalled();
-      expect(queueRepository.save).toHaveBeenCalledWith(users);
+      expect(result).toBe(user);
+      expect(queueRepository.getActiveUser).toHaveBeenCalledWith(userId);
     });
 
-    it('대기중인 사용자가 없을 경우, 활성화하지 않습니다.', async () => {
-      const activeCount = 11;
+    it('활성 사용자를 찾는데 실패할 경우', async () => {
+      const userId = 'user-id';
+      queueRepository.getActiveUser.mockResolvedValueOnce(null);
 
-      queueRepository.getActiveCount.mockResolvedValueOnce(activeCount);
-
-      await service.activateQueueUsers();
-
-      expect(queueRepository.findWaitingUsersByLimit).not.toHaveBeenCalled();
-      expect(queueRepository.save).not.toHaveBeenCalled();
+      await expect(service.checkActive(userId)).rejects.toThrow();
     });
   });
 
-  describe('활성화된 사용자 비활성화', () => {
-    it('활성화된 사용자를 비활성화합니다.', async () => {
-      const activeUsers = [queue];
-      const spyOnExpire = jest.spyOn(queue, 'expire');
+  describe('활성 사용자 만료', () => {
+    it('활성 사용자를 만료시키는데 실패할 경우', async () => {
+      const userId = 'user-id';
+      queueRepository.dequeueActive.mockResolvedValueOnce(null);
 
-      queueRepository.findActiveUsers.mockResolvedValueOnce(activeUsers);
+      await expect(service.expire(userId)).rejects.toThrow();
+    });
+  });
 
-      await service.expireQueueUsers();
+  describe('대기열 사용자 활성화', () => {
+    it('대기열 사용자를 활성화합니다.', async () => {
+      const users = [QueueUser.createWaiting({ userId: '1' })];
+      queueRepository.dequeueWaitingByLimit.mockResolvedValueOnce(users);
 
-      expect(spyOnExpire).toHaveBeenCalled();
-      expect(queueRepository.save).toHaveBeenCalledWith(activeUsers);
+      const result = await service.activateQueueUsers();
+
+      expect(result).toBe(users);
+      expect(queueRepository.activate).toHaveBeenCalledWith(users);
+    });
+  });
+
+  describe('대기열 사용자 만료', () => {
+    it('대기열 사용자를 만료합니다.', async () => {
+      const count = 1;
+      queueRepository.expire.mockResolvedValueOnce({ count });
+
+      const result = await service.expireQueueUsers();
+
+      expect(result).toEqual({ count });
     });
   });
 });
