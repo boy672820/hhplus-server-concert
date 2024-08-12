@@ -1,8 +1,77 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
+  "sourceRoot": "apps/hhplus-server-concert/src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/hhplus-server-concert/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/hhplus-server-concert",
+  "projects": {
+    "hhplus-server-concert": {
+      "type": "application",
+      "root": "apps/hhplus-server-concert",
+      "entryFile": "main",
+      "sourceRoot": "apps/hhplus-server-concert/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/hhplus-server-concert/tsconfig.app.json"
+      }
+    },
+    "service-reservation": {
+      "type": "application",
+      "root": "apps/service-reservation",
+      "entryFile": "main",
+      "sourceRoot": "apps/service-reservation/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/service-reservation/tsconfig.app.json"
+      }
+    },
+    "database": {
+      "type": "library",
+      "root": "libs/database",
+      "entryFile": "index",
+      "sourceRoot": "libs/database/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/database/tsconfig.lib.json"
+      }
+    },
+    "config": {
+      "type": "library",
+      "root": "libs/config",
+      "entryFile": "index",
+      "sourceRoot": "libs/config/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/config/tsconfig.lib.json"
+      }
+    },
+    "domain": {
+      "type": "library",
+      "root": "libs/domain",
+      "entryFile": "index",
+      "sourceRoot": "libs/domain/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/domain/tsconfig.lib.json"
+      }
+    },
+    "redlock": {
+      "type": "library",
+      "root": "libs/redlock",
+      "entryFile": "index",
+      "sourceRoot": "libs/redlock/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/redlock/tsconfig.lib.json"
+      }
+    },
+    "mock-api": {
+      "type": "library",
+      "root": "libs/mock-api",
+      "entryFile": "index",
+      "sourceRoot": "libs/mock-api/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/mock-api/tsconfig.lib.json"
+      }
+    }
   }
 }

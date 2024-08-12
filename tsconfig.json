@@ -19,10 +19,36 @@
     "noFallthroughCasesInSwitch": false,
     "resolveJsonModule": true,
     "paths": {
-      "@lib/*": ["src/lib/*"],
-      "@lib": ["src/lib/*"],
-      "@config/*": ["src/config/*"],
-      "@config": ["src/config"]
+      "@libs/database": [
+        "libs/database/src"
+      ],
+      "@libs/database/*": [
+        "libs/database/src/*"
+      ],
+      "@libs/config": [
+        "libs/config/src"
+      ],
+      "@libs/config/*": [
+        "libs/config/src/*"
+      ],
+      "@libs/domain": [
+        "libs/domain/src"
+      ],
+      "@libs/domain/*": [
+        "libs/domain/src/*"
+      ],
+      "@libs/redlock": [
+        "libs/redlock/src"
+      ],
+      "@libs/redlock/*": [
+        "libs/redlock/src/*"
+      ],
+      "@libs/mock-api": [
+        "libs/mock-api/src"
+      ],
+      "@libs/mock-api/*": [
+        "libs/mock-api/src/*"
+      ]
     }
   }
 }
