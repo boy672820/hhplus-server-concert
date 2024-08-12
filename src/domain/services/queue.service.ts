@@ -1,7 +1,9 @@
+import { QueueStatus } from '@lib/types';
+import { DomainError } from '@lib/errors';
 import { Injectable } from '@nestjs/common';
 import { QueueRepository } from '../repositories';
 import { Queue } from '../models';
-import { DomainError } from '../../lib/errors';
+import { Transactional } from 'typeorm-transactional';
 
 const QUEUE_USER_ACTIVE_LIMIT = 10;
 
@@ -48,25 +50,30 @@ export class QueueService {
     await this.queueRepository.save(queue);
   }
 
-  async activateQueueUsers(): Promise<void> {
+  @Transactional()
+  async activateQueueUsers(): Promise<Queue[]> {
     const activeCount = await this.queueRepository.getActiveCount();
 
     if (activeCount >= QUEUE_USER_ACTIVE_LIMIT) {
-      return;
+      return [];
     }
 
     const total = QUEUE_USER_ACTIVE_LIMIT - activeCount;
 
-    const users = await this.queueRepository.findWaitingUsersByLimit(total);
+    const waitingUsers =
+      await this.queueRepository.findWaitingUsersByLimit(total);
 
-    users.forEach((user) => {
+    waitingUsers.forEach((user) => {
       user.activate();
     });
 
-    await this.queueRepository.save(users);
+    await this.queueRepository.save(waitingUsers);
+
+    return waitingUsers;
   }
 
-  async expireQueueUsers(): Promise<void> {
+  @Transactional()
+  async expireQueueUsers(): Promise<Queue[]> {
     const activeUsers = await this.queueRepository.findActiveUsers();
 
     activeUsers.forEach((user) => {
@@ -74,5 +81,7 @@ export class QueueService {
     });
 
     await this.queueRepository.save(activeUsers);
+
+    return activeUsers.filter((user) => user.status === QueueStatus.Expired);
   }
 }

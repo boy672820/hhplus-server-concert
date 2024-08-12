@@ -12,6 +12,7 @@ const options: DataSourceOptions & SeederOptions = {
   port: config.database.port,
   migrationsTableName: 'typeorm_migrations',
   migrations: [join(__dirname, 'migrations/*{.ts,.js}')],
+  synchronize: false,
   seeds: ['typeorm/seeds/**/*{.ts,.js}'],
   factories: ['typeorm/factories/**/*{.ts,.js}'],
   entities: ['src/**/*.entity{.ts,.js}'],

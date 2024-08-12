@@ -17,9 +17,12 @@ export class SeatRepositoryImpl implements SeatRepository {
   }
 
   async findAvailables(scheduleId: string): Promise<Seat[]> {
-    const entities = await this.dataSource.manager.findBy(SeatEntity, {
-      schedule: { id: scheduleId },
-      status: SeatStatus.Pending,
+    const entities = await this.dataSource.manager.find(SeatEntity, {
+      loadEagerRelations: false,
+      where: {
+        scheduleId,
+        status: SeatStatus.Pending,
+      },
     });
     return entities.map(SeatMapper.toModel);
   }
