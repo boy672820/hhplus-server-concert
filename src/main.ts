@@ -7,16 +7,24 @@ import {
   classSerializerOptions,
   swagger,
 } from './app-config';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.KAFKA,
+  });
+
   app.useGlobalPipes(new ValidationPipe(validationPipeOptions));
   app.useGlobalInterceptors(
     new ClassSerializerInterceptor(app.get(Reflector), classSerializerOptions),
   );
+
   const config = new DocumentBuilder().setTitle(swagger.title).build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
+
+  await app.startAllMicroservices();
   await app.listen(3000);
 }
 bootstrap();

@@ -19,3 +19,7 @@ services:
     restart: always
     ports:
       - '${REDIS_PORT}:6379'
+  kafka:
+    extends:
+      file: docker-compose.kafka.yml
+      service: broker
