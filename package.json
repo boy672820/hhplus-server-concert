@@ -18,10 +18,13 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "test:setup": "docker-compose -f docker/test/docker-compose.yml --env-file .env.test up -d && yarn migration:run:test",
-    "test:integration": "yarn test:setup && jest --config ./test/jest-integration.json",
+    "test:setup": "make start-local && yarn migration:run:test",
+    "test:local:setup": "docker compose --env-file .env.test.local -f docker/test-local/docker-compose.yml up -d && yarn migration:run:test-local",
+    "test:local:integration": "yarn test:setup && jest --config ./test/jest-integration.json",
     "migration:run:test": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d typeorm/test-data-source.ts",
+    "migration:run:test-local": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d typeorm/test-local-data-source.ts",
     "seed:run": "ts-node -r tsconfig-paths/register --project tsconfig.json ./node_modules/typeorm-extension/bin/cli.cjs seed:run -d typeorm/data-source.ts",
+    "seed:run:test": "ts-node -r tsconfig-paths/register --project tsconfig.json ./node_modules/typeorm-extension/bin/cli.cjs seed:run -d typeorm/test-data-source.ts",
     "seed:create": "ts-node ./node_modules/typeorm-extension/bin/cli.cjs seed:create",
     "prepare": "ts-patch install && typia patch"
   },
@@ -34,6 +37,7 @@
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.3",
     "@nestjs/core": "^10.0.0",
+    "@nestjs/cqrs": "^10.2.7",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/schedule": "^4.1.0",
     "@nestjs/swagger": "^7.4.0",
@@ -101,7 +105,9 @@
     "testEnvironment": "node",
     "moduleNameMapper": {
       "^@lib$": "<rootDir>/lib",
-      "^@lib/(.*)$": "<rootDir>/lib/$1"
+      "^@lib/(.*)$": "<rootDir>/lib/$1",
+      "^@config$": "<rootDir>/config",
+      "^@config/(.*)$": "<rootDir>/config/$1"
     }
   }
 }

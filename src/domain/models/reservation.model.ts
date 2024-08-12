@@ -2,8 +2,10 @@ import { LocalDateTime, ReservationStatus } from '@lib/types';
 import { DomainError } from '@lib/errors';
 import Decimal from 'decimal.js';
 import { ulid } from 'ulid';
+import { AggregateRoot } from '@nestjs/cqrs';
+import { ReservationPaidEvent, ReservationReservedSeatEvent } from '../events';
 
-interface Props {
+export interface ReservationProps {
   id: string;
   userId: string;
   eventId: string;
@@ -22,7 +24,22 @@ interface Props {
   createdDate: LocalDateTime;
 }
 
-export class Reservation implements Props {
+export type ReservationCreateProps = Pick<
+  ReservationProps,
+  | 'userId'
+  | 'eventId'
+  | 'eventTitle'
+  | 'eventAddress'
+  | 'eventStartDate'
+  | 'eventEndDate'
+  | 'seatId'
+  | 'seatNumber'
+  | 'price'
+  | 'scheduleStartDate'
+  | 'scheduleEndDate'
+>;
+
+export class Reservation extends AggregateRoot implements ReservationProps {
   id: string;
   userId: string;
   eventId: string;
@@ -40,26 +57,12 @@ export class Reservation implements Props {
   expiresDate: LocalDateTime | null;
   createdDate: LocalDateTime;
 
-  private constructor(props: Props) {
+  private constructor(props: ReservationProps) {
+    super();
     Object.assign(this, props);
   }
 
-  static create = (
-    props: Pick<
-      Props,
-      | 'userId'
-      | 'eventId'
-      | 'eventTitle'
-      | 'eventAddress'
-      | 'eventStartDate'
-      | 'eventEndDate'
-      | 'seatId'
-      | 'seatNumber'
-      | 'price'
-      | 'scheduleStartDate'
-      | 'scheduleEndDate'
-    >,
-  ): Reservation =>
+  static create = (props: ReservationCreateProps): Reservation =>
     new Reservation({
       ...props,
       id: ulid(),
@@ -69,7 +72,12 @@ export class Reservation implements Props {
       createdDate: LocalDateTime.now(),
     });
 
-  static from = (props: Props): Reservation => new Reservation(props);
+  static from = (props: ReservationProps): Reservation =>
+    new Reservation(props);
+
+  reserveSeat(seatId: string): void {
+    this.apply(new ReservationReservedSeatEvent(seatId, this.id));
+  }
 
   pay(userId: string): void {
     if (this.status === ReservationStatus.Paid) {
@@ -81,5 +89,9 @@ export class Reservation implements Props {
     }
 
     this.status = ReservationStatus.Paid;
+
+    this.apply(
+      new ReservationPaidEvent(this.id, this.seatId, this.price.toString()),
+    );
   }
 }

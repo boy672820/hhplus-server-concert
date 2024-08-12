@@ -7,9 +7,7 @@ export class SeatMapper {
     Seat.from({
       id: entity.id,
       eventId: entity.eventId,
-      scheduleId: entity.schedule.id,
-      scheduleStartDate: entity.schedule.startDate,
-      scheduleEndDate: entity.schedule.endDate,
+      scheduleId: entity.scheduleId,
       number: entity.number,
       status: entity.status,
       price: entity.price,
