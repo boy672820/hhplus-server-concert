@@ -10,7 +10,6 @@
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
     "dev": "nest start --watch",
-    "dev:service-reservation": "nest start service-reservation --watch",
     "debug": "nest start --debug --watch",
     "prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
@@ -116,7 +115,8 @@
       "^@config/config(|/.*)$": "<rootDir>/libs/config/src/$1",
       "^@app/domain(|/.*)$": "<rootDir>/libs/domain/src/$1",
       "^@app/redlock(|/.*)$": "<rootDir>/libs/redlock/src/$1",
-      "^@app/mock-api(|/.*)$": "<rootDir>/libs/mock-api/src/$1"
+      "^@app/mock-api(|/.*)$": "<rootDir>/libs/mock-api/src/$1",
+      "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1"
     },
     "roots": [
       "<rootDir>/apps/",
