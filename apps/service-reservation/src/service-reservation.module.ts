@@ -1,10 +1,8 @@
+import { GlobalConfigModule } from '@libs/config';
+import { KafkaConfigModule } from '@libs/config/kafka';
 import { Module } from '@nestjs/common';
-import { ServiceReservationController } from './service-reservation.controller';
-import { ServiceReservationService } from './service-reservation.service';
 
 @Module({
-  imports: [],
-  controllers: [ServiceReservationController],
-  providers: [ServiceReservationService],
+  imports: [GlobalConfigModule, KafkaConfigModule],
 })
 export class ServiceReservationModule {}
