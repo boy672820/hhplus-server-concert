@@ -1,10 +1,9 @@
-import { InjectKafkaClient } from '../../lib/decorators';
 import { Inject } from '@nestjs/common';
-import { ClientKafka } from '@nestjs/microservices';
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { ReservationReservedSeatEvent } from '../../domain/events';
+import { KafkaClient } from '../../lib/kafka';
 
 @EventsHandler(ReservationReservedSeatEvent)
 export class ReservationReservedSeatHandler
@@ -12,7 +11,7 @@ export class ReservationReservedSeatHandler
 {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
-    @InjectKafkaClient() private readonly kafkaClient: ClientKafka,
+    private readonly kafkaClient: KafkaClient,
   ) {}
 
   async handle(event: ReservationReservedSeatEvent) {
