@@ -1,22 +1,12 @@
-import { KafkaConfigModule } from '@libs/config/kafka';
 import { Module } from '@nestjs/common';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { KAFKA_CLIENT } from './kafka-client.token';
+import { ClientsModule } from '@nestjs/microservices';
+import { clientProvider } from './client.provider';
 
 @Module({
   imports: [
-    KafkaConfigModule,
-    ClientsModule.register([
-      {
-        name: KAFKA_CLIENT,
-        transport: Transport.KAFKA,
-        options: {
-          client: {
-            brokers: ['localhost:9092'],
-          },
-        },
-      },
-    ]),
+    ClientsModule.registerAsync({
+      clients: [clientProvider],
+    }),
   ],
   exports: [ClientsModule],
 })
