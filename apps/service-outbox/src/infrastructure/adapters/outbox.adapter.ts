@@ -11,5 +11,12 @@ export class OutboxAdapterImpl extends OutboxAdapter {
     super();
   }
 
-  async save(transaction: Transaction): Promise<void> {}
+  async save(transaction: Transaction): Promise<void> {
+    await this.outboxService.save(transaction);
+  }
+
+  async getTransaction(transactionId: string): Promise<Transaction | null> {
+    const transaction = await this.outboxService.getTransaction(transactionId);
+    return transaction ? OutboxMapper.toModel(transaction) : null;
+  }
 }

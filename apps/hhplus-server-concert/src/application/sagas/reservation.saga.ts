@@ -1,15 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { ofType, Saga } from '@nestjs/cqrs';
-import { mergeMap, map, Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import {
   ReservationCancelledEvent,
   ReservationReservedSeatEvent,
 } from '../../domain/events';
-import {
-  CancelReservationCommand,
-  ReserveSeatCommand,
-  PublishOutboxCommand,
-} from '../commands';
+import { CancelReservationCommand, ReserveSeatCommand } from '../commands';
 
 @Injectable()
 export class ReservationSagas {
@@ -17,11 +13,7 @@ export class ReservationSagas {
   reservedSeat = (events$: Observable<any>): Observable<any> =>
     events$.pipe(
       ofType(ReservationReservedSeatEvent),
-      map((event) => [
-        new ReserveSeatCommand(event.seatId, event.reservationId),
-        new PublishOutboxCommand(),
-      ]),
-      mergeMap((commands) => commands),
+      map((event) => new ReserveSeatCommand(event.seatId, event.reservationId)),
     );
 
   @Saga()

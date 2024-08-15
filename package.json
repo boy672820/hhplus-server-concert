@@ -112,8 +112,9 @@
       "^@libs/redlock(|/.*)$": "<rootDir>/libs/redlock/src/$1",
       "^@libs/mock-api(|/.*)$": "<rootDir>/libs/mock-api/src/$1",
       "^@libs/common(|/.*)$": "<rootDir>/libs/common/src/$1",
-      "^@app/redis(|/.*)$": "<rootDir>/libs/redis/src/$1",
-      "^@app/outbox(|/.*)$": "<rootDir>/libs/outbox/src/$1"
+      "^@libs/redis(|/.*)$": "<rootDir>/libs/redis/src/$1",
+      "^@libs/outbox(|/.*)$": "<rootDir>/libs/outbox/src/$1",
+      "^@libs/logger(|/.*)$": "<rootDir>/libs/logger/src/$1"
     },
     "roots": [
       "<rootDir>/apps/",

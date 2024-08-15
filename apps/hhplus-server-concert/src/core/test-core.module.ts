@@ -1,5 +1,6 @@
 import { GlobalConfigModule } from '@libs/config';
 import { RedisConfigModule, RedisConfigService } from '@libs/config/redis';
+import { LoggerModule } from '@libs/logger';
 import { KafkaModule } from '../lib/kafka';
 import { OutboxModule } from '@libs/outbox';
 import { MockApiModule } from '@libs/mock-api';
@@ -10,7 +11,6 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { DomainExceptionFilter } from './domain-exception.filter';
 import { LoggingInterceptor } from './logging.interceptor';
-import { LoggingModule } from './logging.module';
 
 @Module({
   imports: [
@@ -18,7 +18,7 @@ import { LoggingModule } from './logging.module';
     CqrsModule,
     TestDatabaseModule,
     RedisModule,
-    LoggingModule,
+    LoggerModule,
     KafkaModule,
     MockApiModule,
     OutboxModule.registerAsync({

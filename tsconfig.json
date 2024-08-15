@@ -34,7 +34,9 @@
       "@libs/redis": ["libs/redis/src"],
       "@libs/redis/*": ["libs/redis/src/*"],
       "@libs/outbox": ["libs/outbox/src"],
-      "@libs/outbox/*": ["libs/outbox/src/*"]
+      "@libs/outbox/*": ["libs/outbox/src/*"],
+      "@libs/logger": ["libs/logger/src"],
+      "@libs/logger/*": ["libs/logger/src/*"]
     }
   }
 }
