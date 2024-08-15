@@ -1,5 +1,5 @@
 import { SeatStatus } from '@libs/domain/types';
-import { DomainError } from '../../lib/errors';
+import { DomainError } from '@libs/common/errors';
 import { ulid } from 'ulid';
 import Decimal from 'decimal.js';
 

@@ -1,1 +1,1 @@
-export * from './transaction.model';
+export * from './Transaction';

@@ -1,10 +1,10 @@
 import { Provider } from '@nestjs/common';
-import { TransactionRepository } from '../domain/repositories';
-import { TransactionRepositoryImpl } from './repositories/transaction.repository';
+import { OutboxAdapter } from '../domain/adapters';
+import { OutboxAdapterImpl } from './adapters/outbox.adapter';
 
-export const repositories: Provider[] = [
+export const adapters: Provider[] = [
   {
-    provide: TransactionRepository,
-    useClass: TransactionRepositoryImpl,
+    provide: OutboxAdapter,
+    useClass: OutboxAdapterImpl,
   },
 ];

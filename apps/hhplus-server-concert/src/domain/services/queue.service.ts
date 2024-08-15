@@ -1,5 +1,5 @@
 import { QueueStatus } from '@libs/domain/types';
-import { DomainError } from '../../lib/errors';
+import { DomainError } from '@libs/common/errors';
 import { Injectable } from '@nestjs/common';
 import { QueueRepository } from '../repositories';
 import { Queue } from '../models';

@@ -1,4 +1,4 @@
-import { DomainError } from '../../lib/errors';
+import { DomainError } from '@libs/common/errors';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { Seat } from '../models';
 import { SeatRepository } from '../repositories';

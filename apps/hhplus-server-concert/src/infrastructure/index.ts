@@ -18,6 +18,8 @@ import { PaymentRepositoryImpl } from './repositories/payment.repository';
 import { ReservationMapper } from './mappers/reservation.mapper';
 import { ReservationProducer } from '../domain/producers';
 import { ReservationProducerImpl } from './producers/reservation.producer';
+import { OutboxAdapter } from '../domain/adapters';
+import { OutboxAdapterImpl } from './adapters/outbox.adapter';
 
 export const repositories: Provider[] = [
   {
@@ -58,3 +60,10 @@ export const producers: Provider[] = [
 ];
 
 export const mappers: Provider[] = [ReservationMapper];
+
+export const adapters: Provider[] = [
+  {
+    provide: OutboxAdapter,
+    useClass: OutboxAdapterImpl,
+  },
+];

@@ -1,4 +1,4 @@
-import { DomainError } from '../../lib/errors';
+import { DomainError } from '@libs/common/errors';
 import { Injectable } from '@nestjs/common';
 import { Reservation } from '../models';
 import { ReservationFactory } from '../factories/reservation.factory';

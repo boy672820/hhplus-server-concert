@@ -1,7 +1,7 @@
 import { LocalDateTime } from '@libs/domain/types';
 import { RedlockService } from '@libs/redlock';
 import { Injectable } from '@nestjs/common';
-import { DomainError } from '../../lib/errors';
+import { DomainError } from '@libs/common/errors';
 import Decimal from 'decimal.js';
 import { PointRepository } from '../repositories';
 import { Point } from '../models';

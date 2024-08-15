@@ -1,4 +1,4 @@
-import { DomainError, DomainErrorCode } from '../lib/errors';
+import { DomainError, DomainErrorCode } from '@libs/common/errors';
 import { ArgumentsHost, Catch, ExceptionFilter, Inject } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';

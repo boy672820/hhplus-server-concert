@@ -32,7 +32,9 @@
       "@libs/common": ["libs/common/src"],
       "@libs/common/*": ["libs/common/src/*"],
       "@libs/redis": ["libs/redis/src"],
-      "@libs/redis/*": ["libs/redis/src/*"]
+      "@libs/redis/*": ["libs/redis/src/*"],
+      "@libs/outbox": ["libs/outbox/src"],
+      "@libs/outbox/*": ["libs/outbox/src/*"]
     }
   }
 }
