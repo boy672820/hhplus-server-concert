@@ -11,6 +11,7 @@ import { Event, Reservation, Schedule, Seat } from '../models';
 import Decimal from 'decimal.js';
 import { DomainError } from '../../lib/errors';
 import { ReservationFactory } from '../factories/reservation.factory';
+import { ReservationProducer } from '../producers';
 
 const reservation = Reservation.create({
   userId: '1',
@@ -48,6 +49,7 @@ describe('ReservationService', () => {
   let eventRepository: MockProxy<EventRepository>;
   let scheduleRepository: MockProxy<ScheduleRepository>;
   let seatRepository: MockProxy<SeatRepository>;
+  let reservationProducer: MockProxy<ReservationProducer>;
   let service: ReservationService;
 
   beforeEach(() => {
@@ -56,12 +58,14 @@ describe('ReservationService', () => {
     eventRepository = mock<EventRepository>();
     scheduleRepository = mock<ScheduleRepository>();
     seatRepository = mock<SeatRepository>();
+    reservationProducer = mock<ReservationProducer>();
     service = new ReservationService(
       reservationFactory,
       reservationRepository,
       eventRepository,
       scheduleRepository,
       seatRepository,
+      reservationProducer,
     );
 
     reservationFactory.create.mockReturnValue(reservation);

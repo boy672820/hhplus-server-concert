@@ -3,7 +3,7 @@ import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { ReservationReservedSeatEvent } from '../../domain/events';
-import { KafkaClient } from '../../lib/kafka';
+import { ReservationService } from '../../domain/services';
 
 @EventsHandler(ReservationReservedSeatEvent)
 export class ReservationReservedSeatHandler
@@ -11,14 +11,16 @@ export class ReservationReservedSeatHandler
 {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
-    private readonly kafkaClient: KafkaClient,
+    private readonly reservationService: ReservationService,
   ) {}
 
   async handle(event: ReservationReservedSeatEvent) {
+    const { seatId, reservationId } = event;
+
+    this.reservationService.emitReservedSeat({ seatId, reservationId });
+
     this.logger.info(
       `[좌석 예약됨] 예약 ID: ${event.reservationId} / 좌석 ID: ${event.seatId}`,
     );
-
-    this.kafkaClient.emit('reservation.reserved.seat', event);
   }
 }

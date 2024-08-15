@@ -16,6 +16,8 @@ import { SeatRepositoryImpl } from './repositories/seat.repository';
 import { ReservationRepositoryImpl } from './repositories/reservation.repository';
 import { PaymentRepositoryImpl } from './repositories/payment.repository';
 import { ReservationMapper } from './mappers/reservation.mapper';
+import { ReservationProducer } from '../domain/producers';
+import { ReservationProducerImpl } from './producers/reservation.producer';
 
 export const repositories: Provider[] = [
   {
@@ -45,6 +47,13 @@ export const repositories: Provider[] = [
   {
     provide: PaymentRepository,
     useClass: PaymentRepositoryImpl,
+  },
+];
+
+export const producers: Provider[] = [
+  {
+    provide: ReservationProducer,
+    useClass: ReservationProducerImpl,
   },
 ];
 
