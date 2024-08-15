@@ -81,6 +81,24 @@
       "compilerOptions": {
         "tsConfigPath": "libs/common/tsconfig.lib.json"
       }
+    },
+    "service-outbox": {
+      "type": "application",
+      "root": "apps/service-outbox",
+      "entryFile": "main",
+      "sourceRoot": "apps/service-outbox/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/service-outbox/tsconfig.app.json"
+      }
+    },
+    "redis": {
+      "type": "library",
+      "root": "libs/redis",
+      "entryFile": "index",
+      "sourceRoot": "libs/redis/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/redis/tsconfig.lib.json"
+      }
     }
   }
 }

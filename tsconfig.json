@@ -30,7 +30,9 @@
       "@libs/mock-api": ["libs/mock-api/src"],
       "@libs/mock-api/*": ["libs/mock-api/src/*"],
       "@libs/common": ["libs/common/src"],
-      "@libs/common/*": ["libs/common/src/*"]
+      "@libs/common/*": ["libs/common/src/*"],
+      "@libs/redis": ["libs/redis/src"],
+      "@libs/redis/*": ["libs/redis/src/*"]
     }
   }
 }
