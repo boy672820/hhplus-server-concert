@@ -15,9 +15,13 @@ export class ReservationReservedSeatHandler
   ) {}
 
   async handle(event: ReservationReservedSeatEvent) {
-    const { seatId, reservationId } = event;
+    const { transactionId, seatId, reservationId } = event;
 
-    this.reservationService.emitReservedSeat({ seatId, reservationId });
+    this.reservationService.emitReservedSeat({
+      transactionId,
+      seatId,
+      reservationId,
+    });
 
     this.logger.info(
       `[좌석 예약됨] 예약 ID: ${event.reservationId} / 좌석 ID: ${event.seatId}`,

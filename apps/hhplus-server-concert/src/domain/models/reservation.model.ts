@@ -75,8 +75,16 @@ export class Reservation extends AggregateRoot implements ReservationProps {
   static from = (props: ReservationProps): Reservation =>
     new Reservation(props);
 
-  reserveSeat(seatId: string): void {
-    this.apply(new ReservationReservedSeatEvent(seatId, this.id));
+  reserveSeat({
+    transactionId,
+    seatId,
+  }: {
+    transactionId: string;
+    seatId: string;
+  }): void {
+    this.apply(
+      new ReservationReservedSeatEvent(transactionId, seatId, this.id),
+    );
   }
 
   pay(userId: string): void {

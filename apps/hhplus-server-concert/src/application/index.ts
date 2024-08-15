@@ -13,7 +13,6 @@ import {
   ValidateQueueUseCase,
 } from './usecases';
 import { ReserveSeatHandler } from './commands/reserve-seat.handler';
-import { PublishOutboxHandler } from './commands/publish-outbox.handler';
 import { ReservationReservedSeatHandler } from './events/reservation-reserved-seat.handler';
 import { ReservationCancelledHandler } from './events/reservation-cancelled.handler';
 import { ReservationPaidHandler } from './events/reservation-paid.handler';
@@ -37,7 +36,6 @@ export const usecases: Type<any>[] = [
 export const commands: Type<any>[] = [
   ReserveSeatHandler,
   CancelReservationHandler,
-  PublishOutboxHandler,
 ];
 
 export const events: Type<any>[] = [

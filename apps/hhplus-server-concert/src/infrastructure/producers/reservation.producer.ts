@@ -7,7 +7,11 @@ import { ReservationProducer } from '../../domain/producers';
 export class ReservationProducerImpl implements ReservationProducer {
   constructor(@InjectKafkaClient() private readonly kafkaClient: ClientKafka) {}
 
-  emitReservedSeat(payload: { seatId: string; reservationId: string }): void {
+  emitReservedSeat(payload: {
+    transactionId: string;
+    seatId: string;
+    reservationId: string;
+  }): void {
     this.kafkaClient.emit('reservation.reserved.seat', payload);
   }
 }

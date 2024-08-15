@@ -31,7 +31,7 @@ export class Transaction {
     return this._updatedDate;
   }
 
-  private constructor(props: Props) {
+  protected constructor(props: Props) {
     this._id = props.id;
     this._status = props.status;
     this._createdDate = props.createdDate;

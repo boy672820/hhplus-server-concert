@@ -1,5 +1,6 @@
 import { DomainError } from '@libs/common/errors';
 import { Injectable } from '@nestjs/common';
+import { Transactional } from 'typeorm-transactional';
 import { Reservation } from '../models';
 import { ReservationFactory } from '../factories/reservation.factory';
 import {
@@ -9,6 +10,7 @@ import {
   SeatRepository,
 } from '../repositories';
 import { ReservationProducer } from '../producers';
+import { OutboxAdapter } from '../adapters';
 
 @Injectable()
 export class ReservationService {
@@ -19,8 +21,10 @@ export class ReservationService {
     private readonly scheduleRepository: ScheduleRepository,
     private readonly seatRepository: SeatRepository,
     private readonly reservationProducer: ReservationProducer,
+    private readonly outboxAdapter: OutboxAdapter,
   ) {}
 
+  @Transactional()
   async create({
     userId,
     seatId,
@@ -66,7 +70,9 @@ export class ReservationService {
 
     await this.reservationRepository.save(reservation);
 
-    reservation.reserveSeat(seatId);
+    const transaction = await this.outboxAdapter.publish();
+
+    reservation.reserveSeat({ seatId, transactionId: transaction.id });
     reservation.commit();
 
     return reservation;
@@ -106,7 +112,11 @@ export class ReservationService {
     await this.reservationRepository.remove(reservation);
   }
 
-  emitReservedSeat(payload: { seatId: string; reservationId: string }): void {
+  emitReservedSeat(payload: {
+    transactionId: string;
+    seatId: string;
+    reservationId: string;
+  }): void {
     this.reservationProducer.emitReservedSeat(payload);
   }
 }
