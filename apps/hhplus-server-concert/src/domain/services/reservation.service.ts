@@ -8,6 +8,7 @@ import {
   ScheduleRepository,
   SeatRepository,
 } from '../repositories';
+import { ReservationProducer } from '../producers';
 
 @Injectable()
 export class ReservationService {
@@ -17,6 +18,7 @@ export class ReservationService {
     private readonly eventRepository: EventRepository,
     private readonly scheduleRepository: ScheduleRepository,
     private readonly seatRepository: SeatRepository,
+    private readonly reservationProducer: ReservationProducer,
   ) {}
 
   async create({
@@ -102,5 +104,9 @@ export class ReservationService {
     }
 
     await this.reservationRepository.remove(reservation);
+  }
+
+  emitReservedSeat(payload: { seatId: string; reservationId: string }): void {
+    this.reservationProducer.emitReservedSeat(payload);
   }
 }
