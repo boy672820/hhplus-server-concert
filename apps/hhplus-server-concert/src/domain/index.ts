@@ -1,6 +1,7 @@
 import { Type } from '@nestjs/common';
 import {
   EventService,
+  OutboxService,
   PaymentService,
   PointService,
   QueueService,
@@ -16,6 +17,7 @@ export const services: Type<any>[] = [
   SeatService,
   ReservationService,
   PaymentService,
+  OutboxService,
 ];
 
 export const factories: Type<any>[] = [ReservationFactory];

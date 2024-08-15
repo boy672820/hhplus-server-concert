@@ -9,7 +9,7 @@ import {
 import { ReservationService } from './reservation.service';
 import { Event, Reservation, Schedule, Seat } from '../models';
 import Decimal from 'decimal.js';
-import { DomainError } from '../../lib/errors';
+import { DomainError } from '@libs/common/errors';
 import { ReservationFactory } from '../factories/reservation.factory';
 import { ReservationProducer } from '../producers';
 

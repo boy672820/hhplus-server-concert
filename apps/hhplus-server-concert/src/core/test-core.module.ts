@@ -1,5 +1,7 @@
 import { GlobalConfigModule } from '@libs/config';
+import { RedisConfigModule, RedisConfigService } from '@libs/config/redis';
 import { KafkaModule } from '../lib/kafka';
+import { OutboxModule } from '@libs/outbox';
 import { MockApiModule } from '@libs/mock-api';
 import { TestDatabaseModule } from '@libs/database';
 import { RedisModule } from '@libs/redlock';
@@ -19,6 +21,16 @@ import { LoggingModule } from './logging.module';
     LoggingModule,
     KafkaModule,
     MockApiModule,
+    OutboxModule.registerAsync({
+      imports: [RedisConfigModule],
+      useFactory: (redisConfig: RedisConfigService) => ({
+        redis: {
+          host: redisConfig.host,
+          port: redisConfig.port,
+        },
+      }),
+      inject: [RedisConfigService],
+    }),
   ],
   providers: [
     {
@@ -30,6 +42,6 @@ import { LoggingModule } from './logging.module';
       useClass: LoggingInterceptor,
     },
   ],
-  exports: [RedisModule, CqrsModule, MockApiModule],
+  exports: [RedisModule, CqrsModule, MockApiModule, OutboxModule],
 })
 export class TestCoreModule {}

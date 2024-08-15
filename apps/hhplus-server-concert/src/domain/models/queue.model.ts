@@ -1,5 +1,5 @@
 import { LocalDateTime, QueueStatus } from '@libs/domain/types';
-import { DomainError } from '../../lib/errors';
+import { DomainError } from '@libs/common/errors';
 
 interface Props {
   sequence: number;

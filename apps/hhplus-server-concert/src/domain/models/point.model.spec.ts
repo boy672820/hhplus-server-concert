@@ -1,5 +1,5 @@
 import { LocalDateTime } from '@libs/domain/types';
-import { DomainError } from '../../lib/errors';
+import { DomainError } from '@libs/common/errors';
 import Decimal from 'decimal.js';
 import { Point } from './point.model';
 

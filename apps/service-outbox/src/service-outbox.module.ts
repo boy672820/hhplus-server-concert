@@ -1,25 +1,27 @@
 import { GlobalConfigModule } from '@libs/config';
 import { RedisConfigModule, RedisConfigService } from '@libs/config/redis';
-import { RedisModule } from '@libs/redis';
+import { OutboxModule } from '@libs/outbox';
 import { Module } from '@nestjs/common';
 import { consumers } from './interface';
 import { usecases } from './application';
-import { repositories } from './infrastructure';
+import { adapters } from './infrastructure';
 import { services } from './domain';
 
 @Module({
   imports: [
     GlobalConfigModule,
-    RedisModule.registerAsync({
+    OutboxModule.registerAsync({
       imports: [RedisConfigModule],
-      useFactory: (redisConfig: RedisConfigService) => ({
-        host: redisConfig.host,
-        port: redisConfig.port,
+      useFactory: (redisConfigService: RedisConfigService) => ({
+        redis: {
+          host: redisConfigService.host,
+          port: redisConfigService.port,
+        },
       }),
       inject: [RedisConfigService],
     }),
   ],
-  providers: [...usecases, ...services, ...repositories],
+  providers: [...usecases, ...services, ...adapters],
   controllers: [...consumers],
 })
 export class ServiceOutboxModule {}

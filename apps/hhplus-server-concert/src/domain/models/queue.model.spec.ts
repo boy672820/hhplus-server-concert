@@ -1,6 +1,6 @@
 import { LocalDateTime, QueueStatus } from '@libs/domain/types';
 import { Queue } from './queue.model';
-import { DomainError } from '../../lib/errors';
+import { DomainError } from '@libs/common/errors';
 
 describe('QueueModel', () => {
   let queue: Queue;
