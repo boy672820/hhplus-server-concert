@@ -5,3 +5,4 @@ export * from './Environment';
 export * from './LocalDateTime';
 export * from './QueueStatus';
 export * from './ScheduleStatus';
+export * from './TransactionStatus';

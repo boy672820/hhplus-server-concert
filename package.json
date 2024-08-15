@@ -106,17 +106,13 @@
     "coverageDirectory": "./coverage",
     "testEnvironment": "node",
     "moduleNameMapper": {
-      "^@lib$": "<rootDir>/lib",
-      "^@lib/(.*)$": "<rootDir>/lib/$1",
-      "^@config$": "<rootDir>/config",
-      "^@config/(.*)$": "<rootDir>/config/$1",
-      "^@lib/lib(|/.*)$": "<rootDir>/libs/lib/src/$1",
-      "^@database/database(|/.*)$": "<rootDir>/libs/database/src/$1",
+      "^@libs/database(|/.*)$": "<rootDir>/libs/database/src/$1",
       "^@config/config(|/.*)$": "<rootDir>/libs/config/src/$1",
-      "^@app/domain(|/.*)$": "<rootDir>/libs/domain/src/$1",
-      "^@app/redlock(|/.*)$": "<rootDir>/libs/redlock/src/$1",
-      "^@app/mock-api(|/.*)$": "<rootDir>/libs/mock-api/src/$1",
-      "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1"
+      "^@libs/domain(|/.*)$": "<rootDir>/libs/domain/src/$1",
+      "^@libs/redlock(|/.*)$": "<rootDir>/libs/redlock/src/$1",
+      "^@libs/mock-api(|/.*)$": "<rootDir>/libs/mock-api/src/$1",
+      "^@libs/common(|/.*)$": "<rootDir>/libs/common/src/$1",
+      "^@app/redis(|/.*)$": "<rootDir>/libs/redis/src/$1"
     },
     "roots": [
       "<rootDir>/apps/",
