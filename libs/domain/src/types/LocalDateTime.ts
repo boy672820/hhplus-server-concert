@@ -36,4 +36,11 @@ export class LocalDateTime {
   toEqual = (other: LocalDateTime): boolean => this.value.equals(other.value);
 
   isBeforeNow = (): boolean => this.value.isBefore(JodaDateTime.now());
+
+  isBefore = (other: LocalDateTime): boolean =>
+    this.value.isBefore(other.value);
+
+  isAfter = (other: LocalDateTime): boolean => this.value.isAfter(other.value);
+
+  isAfterNow = (): boolean => this.value.isAfter(JodaDateTime.now());
 }

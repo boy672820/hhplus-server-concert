@@ -11,8 +11,7 @@ export class DomainExceptionFilter implements ExceptionFilter {
 
   catch(error: DomainError) {
     this.logger.error(
-      `[DomainExceptionFilter] Error: ${error.code}`,
-      error.message,
+      `[DomainExceptionFilter] Error: ${error.code}: ${error.message}`,
     );
 
     return {
