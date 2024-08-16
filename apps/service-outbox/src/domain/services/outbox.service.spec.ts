@@ -36,4 +36,25 @@ describe('OutboxService', () => {
       });
     });
   });
+
+  describe('트랜잭션 성공', () => {
+    it('트랜잭션을 성공시킵니다.', async () => {
+      const spyOnSuccess = jest.spyOn(transaction, 'success');
+
+      await service.successTransaction('transactionId');
+
+      expect(spyOnSuccess).toHaveBeenCalled();
+      expect(outboxAdapter.save).toHaveBeenCalledWith(transaction);
+    });
+
+    describe('트랜잭션 성공이 실패하는 경우', () => {
+      it('트랜잭션을 가져오지 못하였습니다.', async () => {
+        outboxAdapter.getTransaction.mockResolvedValueOnce(null);
+
+        await expect(
+          service.successTransaction('transactionId'),
+        ).rejects.toThrow();
+      });
+    });
+  });
 });

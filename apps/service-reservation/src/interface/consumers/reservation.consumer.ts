@@ -9,7 +9,11 @@ export class ReservationConsumer {
 
   @EventPattern('reservation.reserved.seat')
   async handleReservedSeat(@Payload() data: ReservedSeatMessage) {
-    const { seatId, reservationId } = data;
-    await this.reserveSeatUseCase.execute({ seatId, reservationId });
+    const { transactionId, seatId, reservationId } = data;
+    await this.reserveSeatUseCase.execute({
+      transactionId,
+      seatId,
+      reservationId,
+    });
   }
 }

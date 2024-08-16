@@ -17,4 +17,16 @@ export class OutboxService {
 
     await this.outboxAdapter.save(transaction);
   }
+
+  async successTransaction(transactionId: string): Promise<void> {
+    const transaction = await this.outboxAdapter.getTransaction(transactionId);
+
+    if (!transaction) {
+      throw DomainError.notFound('트랜잭션을 찾을 수 없습니다.');
+    }
+
+    transaction.success();
+
+    await this.outboxAdapter.save(transaction);
+  }
 }

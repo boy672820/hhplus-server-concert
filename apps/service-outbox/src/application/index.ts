@@ -1,4 +1,10 @@
 import { Type } from '@nestjs/common';
-import { ProgressTransactionUseCase } from './usecases';
+import {
+  ProgressTransactionUseCase,
+  SuccessTransactionUseCase,
+} from './usecases';
 
-export const usecases: Type<any>[] = [ProgressTransactionUseCase];
+export const usecases: Type<any>[] = [
+  ProgressTransactionUseCase,
+  SuccessTransactionUseCase,
+];

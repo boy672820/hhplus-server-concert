@@ -55,4 +55,13 @@ export class Transaction {
     this._status = TransactionStatus.Progressing;
     this._updatedDate = LocalDateTime.now();
   }
+
+  success(): void {
+    if (this._status !== TransactionStatus.Progressing) {
+      throw DomainError.conflict('진행되지 않은 트랜잭션입니다.');
+    }
+
+    this._status = TransactionStatus.Completed;
+    this._updatedDate = LocalDateTime.now();
+  }
 }
