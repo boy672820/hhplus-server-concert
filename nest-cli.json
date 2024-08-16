@@ -117,6 +117,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/logger/tsconfig.lib.json"
       }
+    },
+    "kafka-client": {
+      "type": "library",
+      "root": "libs/kafka-client",
+      "entryFile": "index",
+      "sourceRoot": "libs/kafka-client/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/kafka-client/tsconfig.lib.json"
+      }
     }
   }
 }

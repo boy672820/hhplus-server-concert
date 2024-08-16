@@ -1,11 +1,12 @@
 import { GlobalConfigModule } from '@libs/config';
 import { RedisConfigModule, RedisConfigService } from '@libs/config/redis';
+import { KafkaConfigModule, KafkaConfigService } from '@libs/config/kafka';
 import { DatabaseModule } from '@libs/database';
 import { LoggerModule } from '@libs/logger';
 import { OutboxModule } from '@libs/outbox';
-import { KafkaModule } from '../lib/kafka';
 import { MockApiModule } from '@libs/mock-api';
 import { RedisModule } from '@libs/redlock';
+import { KafkaClientModule } from '@libs/kafka-client';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -21,8 +22,14 @@ import { LoggingInterceptor } from './logging.interceptor';
     DatabaseModule,
     RedisModule,
     LoggerModule,
-    KafkaModule,
     MockApiModule,
+    KafkaClientModule.registerAsync({
+      imports: [KafkaConfigModule],
+      useFactory: (kafkaConfig: KafkaConfigService) => ({
+        brokers: [`${kafkaConfig.host}:${kafkaConfig.port}`],
+      }),
+      inject: [KafkaConfigService],
+    }),
     OutboxModule.registerAsync({
       imports: [RedisConfigModule],
       useFactory: (redisConfig: RedisConfigService) => ({
@@ -44,6 +51,12 @@ import { LoggingInterceptor } from './logging.interceptor';
       useClass: LoggingInterceptor,
     },
   ],
-  exports: [RedisModule, CqrsModule, MockApiModule, KafkaModule, OutboxModule],
+  exports: [
+    RedisModule,
+    CqrsModule,
+    MockApiModule,
+    KafkaClientModule,
+    OutboxModule,
+  ],
 })
 export class CoreModule {}

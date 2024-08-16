@@ -114,7 +114,8 @@
       "^@libs/common(|/.*)$": "<rootDir>/libs/common/src/$1",
       "^@libs/redis(|/.*)$": "<rootDir>/libs/redis/src/$1",
       "^@libs/outbox(|/.*)$": "<rootDir>/libs/outbox/src/$1",
-      "^@libs/logger(|/.*)$": "<rootDir>/libs/logger/src/$1"
+      "^@libs/logger(|/.*)$": "<rootDir>/libs/logger/src/$1",
+      "^@libs/kafka-client(|/.*)$": "<rootDir>/libs/kafka-client/src/$1"
     },
     "roots": [
       "<rootDir>/apps/",

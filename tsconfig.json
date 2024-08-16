@@ -36,7 +36,9 @@
       "@libs/outbox": ["libs/outbox/src"],
       "@libs/outbox/*": ["libs/outbox/src/*"],
       "@libs/logger": ["libs/logger/src"],
-      "@libs/logger/*": ["libs/logger/src/*"]
+      "@libs/logger/*": ["libs/logger/src/*"],
+      "@libs/kafka-client": ["libs/kafka-client/src"],
+      "@libs/kafka-client/*": ["libs/kafka-client/src/*"]
     }
   }
 }

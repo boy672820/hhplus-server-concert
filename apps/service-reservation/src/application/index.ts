@@ -1,4 +1,4 @@
 import { Type } from '@nestjs/common';
-import { InvokeMockApiUseCase } from './usecases';
+import { ReserveSeatUseCase } from './usecases';
 
-export const usecases: Type<any>[] = [InvokeMockApiUseCase];
+export const usecases: Type<any>[] = [ReserveSeatUseCase];

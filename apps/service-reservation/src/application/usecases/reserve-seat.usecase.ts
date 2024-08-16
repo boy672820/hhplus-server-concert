@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ReservationService } from '../../domain/services';
 
 @Injectable()
-export class InvokeMockApiUseCase {
+export class ReserveSeatUseCase {
   constructor(private readonly reservationService: ReservationService) {}
 
   async execute({
@@ -12,6 +12,6 @@ export class InvokeMockApiUseCase {
     seatId: string;
     reservationId: string;
   }): Promise<void> {
-    await this.reservationService.sendMockApi({ seatId, reservationId });
+    await this.reservationService.reserveSeat({ seatId, reservationId });
   }
 }
