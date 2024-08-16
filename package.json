@@ -20,7 +20,7 @@
     "test:e2e": "jest --config ./apps/hhplus-server-concert/test/jest-e2e.json",
     "test:setup": "make start-local && yarn migration:run:test",
     "test:local:setup": "docker compose --env-file .env.test.local -f docker/test-local/docker-compose.yml up -d && yarn migration:run:test-local",
-    "test:local:integration": "yarn test:setup && jest --config ./test/jest-integration.json",
+    "test:local:integration": "yarn test:setup && jest --config ./apps/hhplus-server-concert/test/jest-integration.json",
     "migration:run:test": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d typeorm/test-data-source.ts",
     "migration:run:test-local": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d typeorm/test-local-data-source.ts",
     "seed:run": "ts-node -r tsconfig-paths/register --project tsconfig.json ./node_modules/typeorm-extension/bin/cli.cjs seed:run -d typeorm/data-source.ts",
