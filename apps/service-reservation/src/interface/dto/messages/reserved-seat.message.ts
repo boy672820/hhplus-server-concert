@@ -1,4 +1,5 @@
 export class ReservedSeatMessage {
-  reservationId: string;
+  transactionId: string;
   seatId: string;
+  reservationId: string;
 }
