@@ -61,15 +61,17 @@ export class Transaction extends AggregateRoot {
   static create = (
     type: EventType,
     payload: Record<string, any>,
-  ): Transaction =>
-    new Transaction({
-      id: ulid(),
+  ): Transaction => {
+    const id = ulid();
+    return new Transaction({
+      id,
       type,
-      payload: JSON.stringify(payload),
+      payload: JSON.stringify({ ...payload, transactionId: id }),
       status: TransactionStatus.Pending,
       createdDate: LocalDateTime.now(),
       updatedDate: LocalDateTime.now(),
     });
+  };
 
   static from = (props: Props): Transaction => new Transaction(props);
 
@@ -104,7 +106,5 @@ export class Transaction extends AggregateRoot {
     }
   }
 
-  getPayload(): Record<string, any> {
-    return JSON.parse(this._payload);
-  }
+  getPayload = (): Record<string, any> => JSON.parse(this._payload);
 }

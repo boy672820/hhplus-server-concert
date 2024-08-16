@@ -13,7 +13,7 @@ export class OutboxRepository {
   constructor(@InjectRedis() private readonly redis: Redis) {}
 
   async save(transaction: Transaction): Promise<void> {
-    const separator = Math.random().toString(36).substring(7);
+    const separator = Math.random().toString(36).substring(2, 8);
 
     await this.redis.set(
       this.key(transaction.status, transaction.id),
@@ -65,7 +65,10 @@ export class OutboxRepository {
         return acc;
       }
 
-      const [type, payload, createdDate, updatedDate] = value.split('@');
+      const separator = value.substring(value.length - 6);
+      const withoutSeparator = value.substring(0, value.length - 6);
+      const [type, payload, createdDate, updatedDate] =
+        withoutSeparator.split(separator);
       const transaction = Transaction.from({
         id: keys[index].split(':')[2],
         type: type as EventType,
