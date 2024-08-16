@@ -1,6 +1,6 @@
+import { InjectKafkaClient } from '@libs/kafka-client/decorators';
 import { Injectable } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
-import { InjectKafkaClient } from '../../lib/decorators';
 import { ReservationProducer } from '../../domain/producers';
 
 @Injectable()

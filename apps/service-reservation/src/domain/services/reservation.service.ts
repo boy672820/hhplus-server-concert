@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { MockApiAdapter } from '../adapters';
+import { ReservationProducer } from '../producers';
 
 @Injectable()
 export class ReservationService {
-  constructor(private readonly mockApiAdapter: MockApiAdapter) {}
+  constructor(
+    private readonly mockApiAdapter: MockApiAdapter,
+    private readonly reservationProducer: ReservationProducer,
+  ) {}
 
-  async sendMockApi({
+  async reserveSeat({
     seatId,
     reservationId,
   }: {
@@ -13,5 +17,10 @@ export class ReservationService {
     reservationId: string;
   }): Promise<void> {
     await this.mockApiAdapter.send(seatId, reservationId);
+
+    this.reservationProducer.emitSuccessedReservation({
+      seatId,
+      reservationId,
+    });
   }
 }

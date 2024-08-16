@@ -1,1 +1,1 @@
-export * from './invoke-mock-api.usecase';
+export * from './reserve-seat.usecase';
