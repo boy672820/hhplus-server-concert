@@ -1,3 +1,4 @@
+import { EventType } from '@libs/domain/types';
 import { DomainError } from '@libs/common/errors';
 import { Injectable } from '@nestjs/common';
 import { Transactional } from 'typeorm-transactional';
@@ -11,6 +12,7 @@ import {
 } from '../repositories';
 import { ReservationProducer } from '../producers';
 import { OutboxAdapter } from '../adapters';
+import { ReservationReservedSeatEvent } from '../events';
 
 @Injectable()
 export class ReservationService {
@@ -70,7 +72,13 @@ export class ReservationService {
 
     await this.reservationRepository.save(reservation);
 
-    const transaction = await this.outboxAdapter.publish();
+    const transaction = await this.outboxAdapter.publish(
+      EventType.ReservationReservedSeat,
+      ReservationReservedSeatEvent.toPayload({
+        reservationId: reservation.id,
+        seatId: seat.id,
+      }),
+    );
 
     reservation.reserveSeat({ seatId, transactionId: transaction.id });
     reservation.commit();

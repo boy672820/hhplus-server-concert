@@ -1,17 +1,26 @@
-import { LocalDateTime, TransactionStatus } from '@libs/domain/types';
+import {
+  EventType,
+  LocalDateTime,
+  TransactionStatus,
+} from '@libs/domain/types';
 import { DomainError } from '@libs/common/errors';
+import { AggregateRoot } from '@nestjs/cqrs';
 import { ulid } from 'ulid';
 
 interface Props {
   id: string;
+  type: EventType;
   status: TransactionStatus;
+  payload: string;
   createdDate: LocalDateTime;
   updatedDate: LocalDateTime;
 }
 
-export class Transaction {
+export class Transaction extends AggregateRoot {
   private _id: string;
+  private _type: EventType;
   private _status: TransactionStatus;
+  private _payload: string;
   private _createdDate: LocalDateTime;
   private _updatedDate: LocalDateTime;
 
@@ -19,8 +28,16 @@ export class Transaction {
     return this._id;
   }
 
+  get type(): EventType {
+    return this._type;
+  }
+
   get status(): TransactionStatus {
     return this._status;
+  }
+
+  get payload(): string {
+    return this._payload;
   }
 
   get createdDate(): LocalDateTime {
@@ -32,14 +49,23 @@ export class Transaction {
   }
 
   protected constructor(props: Props) {
+    super();
     this._id = props.id;
+    this._type = props.type;
     this._status = props.status;
+    this._payload = props.payload;
     this._createdDate = props.createdDate;
+    this._updatedDate = props.updatedDate;
   }
 
-  static create = (): Transaction =>
+  static create = (
+    type: EventType,
+    payload: Record<string, any>,
+  ): Transaction =>
     new Transaction({
       id: ulid(),
+      type,
+      payload: JSON.stringify(payload),
       status: TransactionStatus.Pending,
       createdDate: LocalDateTime.now(),
       updatedDate: LocalDateTime.now(),
@@ -63,5 +89,22 @@ export class Transaction {
 
     this._status = TransactionStatus.Completed;
     this._updatedDate = LocalDateTime.now();
+  }
+
+  getPrevStatus(): TransactionStatus {
+    switch (this._status) {
+      case TransactionStatus.Pending:
+        throw DomainError.conflict('이전 상태가 존재하지 않습니다.');
+      case TransactionStatus.Progressing:
+        return TransactionStatus.Pending;
+      case TransactionStatus.Completed:
+        return TransactionStatus.Progressing;
+      default:
+        throw DomainError.conflict('알 수 없는 상태입니다.');
+    }
+  }
+
+  getPayload(): Record<string, any> {
+    return JSON.parse(this._payload);
   }
 }

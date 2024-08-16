@@ -6,3 +6,4 @@ export * from './LocalDateTime';
 export * from './QueueStatus';
 export * from './ScheduleStatus';
 export * from './TransactionStatus';
+export * from './EventType';
