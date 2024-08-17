@@ -19,10 +19,26 @@
     "noFallthroughCasesInSwitch": false,
     "resolveJsonModule": true,
     "paths": {
-      "@lib/*": ["src/lib/*"],
-      "@lib": ["src/lib/*"],
-      "@config/*": ["src/config/*"],
-      "@config": ["src/config"]
+      "@libs/database": ["libs/database/src"],
+      "@libs/database/*": ["libs/database/src/*"],
+      "@libs/config": ["libs/config/src"],
+      "@libs/config/*": ["libs/config/src/*"],
+      "@libs/domain": ["libs/domain/src"],
+      "@libs/domain/*": ["libs/domain/src/*"],
+      "@libs/redlock": ["libs/redlock/src"],
+      "@libs/redlock/*": ["libs/redlock/src/*"],
+      "@libs/mock-api": ["libs/mock-api/src"],
+      "@libs/mock-api/*": ["libs/mock-api/src/*"],
+      "@libs/common": ["libs/common/src"],
+      "@libs/common/*": ["libs/common/src/*"],
+      "@libs/redis": ["libs/redis/src"],
+      "@libs/redis/*": ["libs/redis/src/*"],
+      "@libs/outbox": ["libs/outbox/src"],
+      "@libs/outbox/*": ["libs/outbox/src/*"],
+      "@libs/logger": ["libs/logger/src"],
+      "@libs/logger/*": ["libs/logger/src/*"],
+      "@libs/kafka-client": ["libs/kafka-client/src"],
+      "@libs/kafka-client/*": ["libs/kafka-client/src/*"]
     }
   }
 }

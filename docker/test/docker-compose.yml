@@ -22,6 +22,10 @@ services:
     restart: always
     ports:
       - '6377:6379'
+  kafka:
+    extends:
+      file: docker-compose.kafka.yml
+      service: broker
   server:
     container_name: hhplus-server-concert
     image: hhplus-server-concert:test
