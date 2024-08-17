@@ -11,6 +11,8 @@ import '@js-joda/timezone';
 export class LocalDateTime {
   constructor(private readonly value: JodaDateTime) {}
 
+  static max = (): LocalDateTime => new LocalDateTime(JodaDateTime.MAX);
+
   static now = (): LocalDateTime => new LocalDateTime(JodaDateTime.now());
 
   static of = (date: LocalDate, time: LocalTime): LocalDateTime =>
@@ -21,6 +23,15 @@ export class LocalDateTime {
 
   static fromDate = (value: Date): LocalDateTime =>
     new LocalDateTime(nativeJs(value).toLocalDateTime());
+
+  static verify = (value: string): boolean => {
+    try {
+      JodaDateTime.parse(value);
+      return true;
+    } catch {
+      return false;
+    }
+  };
 
   toDate = (zoneId?: string): Date =>
     convert(this.value, zoneId ? ZoneId.of(zoneId) : undefined).toDate();
@@ -34,6 +45,9 @@ export class LocalDateTime {
     new LocalDateTime(this.value.minusMinutes(minutes));
 
   toEqual = (other: LocalDateTime): boolean => this.value.equals(other.value);
+
+  toEpochMilli = (): number =>
+    this.value.atZone(ZoneId.of('Asia/Seoul')).toInstant().toEpochMilli();
 
   isBeforeNow = (): boolean => this.value.isBefore(JodaDateTime.now());
 

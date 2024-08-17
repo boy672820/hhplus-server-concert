@@ -1,4 +1,3 @@
-export * from './generate-token.usecase';
 export * from './find-events.usecase';
 export * from './find-schedules-between.usecase';
 export * from './find-available-seats.usecase';
@@ -9,3 +8,4 @@ export * from './activate-queue-users.usecase';
 export * from './expire-queue-users.usecase';
 export * from './recharge-point.usecase';
 export * from './find-event-schedules.usecase';
+export * from './sign-queue-token.usecase';

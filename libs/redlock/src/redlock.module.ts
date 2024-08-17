@@ -23,7 +23,7 @@ import { RedlockService } from './redlock.service';
   ],
   exports: [redisProvider, redlockProvider, RedlockService],
 })
-export class RedisModule implements OnModuleDestroy {
+export class RedlockModule implements OnModuleDestroy {
   constructor(
     @Inject(REDIS_PROVIDER) private readonly redis: Redis,
     @Inject(PUBREDIS_PROVIDER) private readonly pubRedis: Redis,
