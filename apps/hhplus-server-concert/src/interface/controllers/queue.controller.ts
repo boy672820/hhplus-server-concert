@@ -8,13 +8,13 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { GenerateTokenUsecase } from '../../application/usecases';
+import { SignQueueUserUseCase } from '../../application/usecases';
 import { TokenResponse } from '../dto/responses';
 
 @ApiTags('대기열 시스템')
 @Controller('queue')
 export class QueueController {
-  constructor(private readonly generateTokenUseCase: GenerateTokenUsecase) {}
+  constructor(private readonly signQueueUserUseCase: SignQueueUserUseCase) {}
 
   @ApiOperation({
     summary: '대기열 토큰 생성',
@@ -29,7 +29,7 @@ export class QueueController {
   @UseGuards(AuthGuard)
   @Post('token')
   async generateToken(@User() { userId }: { userId: string }) {
-    const token = await this.generateTokenUseCase.execute({ userId });
+    const { token } = await this.signQueueUserUseCase.execute({ userId });
     return ResponseEntity.okWith(TokenResponse.of(token));
   }
 }

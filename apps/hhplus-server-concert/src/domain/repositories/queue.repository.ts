@@ -1,15 +1,10 @@
-import { LocalDateTime, QueueStatus } from '@libs/domain/types';
-import { Queue } from '../models';
+import { QueueUser } from '../models';
 
 export abstract class QueueRepository {
-  abstract create(input: {
-    userId: string;
-    status: QueueStatus;
-    expiresDate: LocalDateTime;
-  }): Promise<Queue>;
-  abstract findLastestByUserId(userId: string): Promise<Queue | null>;
-  abstract save(queue: Queue | Queue[]): Promise<void>;
-  abstract getActiveCount(): Promise<number>;
-  abstract findWaitingUsersByLimit(limit: number): Promise<Queue[]>;
-  abstract findActiveUsers(): Promise<Queue[]>;
+  abstract enqueue(queueUser: QueueUser): Promise<void>;
+  abstract dequeueWaitingByLimit(limit: number): Promise<QueueUser[]>;
+  abstract activate(queueUsers: QueueUser[]): Promise<void>;
+  abstract expire(): Promise<{ count: number }>;
+  abstract getActiveUser(userId: string): Promise<QueueUser | null>;
+  abstract dequeueActive(userId: string): Promise<QueueUser | null>;
 }

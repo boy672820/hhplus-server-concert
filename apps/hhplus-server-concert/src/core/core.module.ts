@@ -4,8 +4,9 @@ import { KafkaConfigModule, KafkaConfigService } from '@libs/config/kafka';
 import { DatabaseModule } from '@libs/database';
 import { LoggerModule } from '@libs/logger';
 import { OutboxModule } from '@libs/outbox';
+import { RedisModule } from '@libs/redis';
 import { MockApiModule } from '@libs/mock-api';
-import { RedisModule } from '@libs/redlock';
+import { RedlockModule } from '@libs/redlock';
 import { KafkaClientModule } from '@libs/kafka-client';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { Module } from '@nestjs/common';
@@ -20,9 +21,17 @@ import { LoggingInterceptor } from './logging.interceptor';
     CqrsModule,
     ScheduleModule.forRoot(),
     DatabaseModule,
-    RedisModule,
+    RedlockModule,
     LoggerModule,
     MockApiModule,
+    RedisModule.registerAsync({
+      imports: [RedisConfigModule],
+      useFactory: (redisConfig: RedisConfigService) => ({
+        host: redisConfig.host,
+        port: redisConfig.port,
+      }),
+      inject: [RedisConfigService],
+    }),
     KafkaClientModule.registerAsync({
       imports: [KafkaConfigModule],
       useFactory: (kafkaConfig: KafkaConfigService) => ({
@@ -52,9 +61,10 @@ import { LoggingInterceptor } from './logging.interceptor';
     },
   ],
   exports: [
-    RedisModule,
+    RedlockModule,
     CqrsModule,
     MockApiModule,
+    RedisModule,
     KafkaClientModule,
     OutboxModule,
   ],

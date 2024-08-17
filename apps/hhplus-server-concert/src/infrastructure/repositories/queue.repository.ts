@@ -1,64 +1,81 @@
-import { QueueEntity } from '@libs/database/entities';
-import { LocalDateTime, QueueStatus } from '@libs/domain/types';
+import { InjectRedis } from '@libs/redis/decorators';
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { Redis } from 'ioredis';
 import { QueueRepository } from '../../domain/repositories';
-import { Queue } from '../../domain/models';
-import { QueueMapper } from '../mappers/queue.mapper';
+import { QueueUser } from '../../domain/models';
+import { QueueUserMapper } from '../mappers/queue-user.mapper';
 
 @Injectable()
 export class QueueRepositoryImpl implements QueueRepository {
-  constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
+  constructor(@InjectRedis() private readonly redis: Redis) {}
 
-  async create(input: {
-    userId: string;
-    status: QueueStatus;
-    expiresDate: LocalDateTime;
-  }): Promise<Queue> {
-    const entity = await this.dataSource.manager.create(QueueEntity, {
-      userId: input.userId,
-      status: input.status,
-      expiresDate: input.expiresDate,
-    });
-    await this.dataSource.manager.save(entity);
-    return QueueMapper.toModel(entity);
+  async enqueue(queueUser: QueueUser): Promise<void> {
+    await this.redis.zadd(
+      'queue-users:waiting',
+      queueUser.expiresDate.toEpochMilli(),
+      queueUser.userId,
+    );
   }
 
-  async findLastestByUserId(userId: string): Promise<Queue | null> {
-    const entity = await this.dataSource.manager.findOne(QueueEntity, {
-      where: { userId },
-      order: { sequence: 'DESC' },
-    });
-    return entity ? QueueMapper.toModel(entity) : null;
+  async dequeueWaitingByLimit(limit: number): Promise<QueueUser[]> {
+    const replies = await this.redis
+      .multi()
+      .zrange('queue-users:waiting', 0, limit - 1)
+      .zremrangebyrank('queue-users:waiting', 0, limit - 1)
+      .exec();
+
+    if (!replies) {
+      throw new Error('Redis transaction failed');
+    }
+
+    const [[zrangeError, members], [zremrangebyrankError]] = replies;
+
+    if (zrangeError || zremrangebyrankError) {
+      throw zrangeError || zremrangebyrankError;
+    }
+
+    return (members as string[]).map((userId) =>
+      QueueUserMapper.createActive(userId),
+    );
   }
 
-  async save(queue: Queue | Queue[]): Promise<void> {
-    const entity = Array.isArray(queue)
-      ? queue.map(QueueMapper.toEntity)
-      : QueueMapper.toEntity(queue);
-    await this.dataSource.manager.save(entity);
+  async activate(queueUsers: QueueUser[]): Promise<void> {
+    const users = queueUsers.map((user) => user.userId);
+
+    if (users.length === 0) {
+      return;
+    }
+
+    await this.redis.sadd('queue-users:active', users);
   }
 
-  async getActiveCount(): Promise<number> {
-    const result = await this.dataSource.manager.count(QueueEntity, {
-      where: { status: QueueStatus.Active },
-    });
-    return result;
+  async expire(): Promise<{ count: number }> {
+    const count = await this.redis.zremrangebyscore(
+      'queue-users:waiting',
+      0,
+      Date.now(),
+    );
+
+    return { count };
   }
 
-  async findWaitingUsersByLimit(limit: number): Promise<Queue[]> {
-    const entities = await this.dataSource.manager.find(QueueEntity, {
-      where: { status: QueueStatus.Waiting },
-      take: limit,
-    });
-    return entities.map(QueueMapper.toModel);
+  async getActiveUser(userId: string): Promise<QueueUser | null> {
+    const result = await this.redis.sismember('queue-users:active', userId);
+
+    if (result === 0) {
+      return null;
+    }
+
+    return QueueUserMapper.createActive(userId);
   }
 
-  async findActiveUsers(): Promise<Queue[]> {
-    const entities = await this.dataSource.manager.find(QueueEntity, {
-      where: { status: QueueStatus.Active },
-    });
-    return entities.map(QueueMapper.toModel);
+  async dequeueActive(userId: string): Promise<QueueUser | null> {
+    const result = await this.redis.srem('queue-users:active', userId);
+
+    if (result === 0) {
+      return null;
+    }
+
+    return QueueUserMapper.createActive(userId);
   }
 }
