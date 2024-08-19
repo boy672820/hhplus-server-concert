@@ -8,6 +8,7 @@ interface Schedule {
   startDate: LocalDateTime;
   endDate: LocalDateTime;
   event: EventEntity;
+  status?: ScheduleStatus;
 }
 
 @Entity('schedule')
