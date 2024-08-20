@@ -1,20 +1,24 @@
-import { Lock as Redlock } from 'redlock';
+import * as Redlock from 'redlock';
 
 export class Lock {
   private constructor(
     private readonly lock: Redlock,
-    private readonly resources: string[],
+    private readonly _resources: string[],
   ) {}
 
-  static create = (lock: Redlock, resources: string[]): Lock =>
-    new Lock(lock, resources);
-
-  static channel = (resources: string[]): string =>
-    `lock:${resources.join(':')}`;
-
-  async release(): Promise<void> {
-    await this.lock.release();
+  get resources(): string[] {
+    return this._resources;
   }
 
-  getChannel = (): string => Lock.channel(this.resources);
+  static channel: string = 'lock';
+
+  static create = (lock: Redlock, _resources: string[]): Lock =>
+    new Lock(lock, _resources);
+
+  async release(): Promise<void> {
+    await this.lock.unlock();
+  }
+
+  static toReleased = (_resources: string[]): string =>
+    `released:${_resources.join(',')}`;
 }

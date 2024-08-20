@@ -1,5 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
-import Redlock from 'redlock';
+import {
+  Inject,
+  Injectable,
+  OnModuleDestroy,
+  OnModuleInit,
+} from '@nestjs/common';
+import * as Redlock from 'redlock';
 import { Redis } from 'ioredis';
 import { Lock } from './lock.model';
 import {
@@ -9,32 +14,44 @@ import {
 } from './redlock.provider';
 
 @Injectable()
-export class RedlockService {
+export class RedlockService implements OnModuleInit, OnModuleDestroy {
   constructor(
     @Inject(REDLOCK_PROVIDER) private readonly redlock: Redlock,
     @Inject(SUBREDIS_PROVIDER) private readonly subRedis: Redis,
     @Inject(PUBREDIS_PROVIDER) private readonly pubRedis: Redis,
   ) {}
 
+  async onModuleInit() {
+    const channel = Lock.channel;
+
+    this.subRedis.subscribe(channel, (err) => {
+      if (err) {
+        this.subRedis.unsubscribe(channel);
+      }
+    });
+  }
+
+  async onModuleDestroy() {
+    this.subRedis.removeAllListeners();
+    this.subRedis.disconnect();
+    this.pubRedis.disconnect();
+  }
+
   async acquire(resources: string[], ttl = 10_000): Promise<Lock> {
-    const channel = Lock.channel(resources);
     try {
       const lock = await this.redlock.acquire(['lock', ...resources], ttl, {
         retryCount: 0,
       });
-      this.pubRedis.publish(channel, 'acquired');
       return Lock.create(lock, resources);
     } catch (e) {
       return new Promise((resolve, reject) => {
-        this.subRedis.subscribe(channel, (err) => {
-          if (err) {
-            this.subRedis.unsubscribe(channel);
-            reject(err);
-          }
-        });
+        const timeout = setTimeout(() => {
+          clearTimeout(timeout);
+          reject(e);
+        }, 1000);
+
         this.subRedis.once('message', (_, message) => {
-          if (message === 'released') {
-            this.subRedis.unsubscribe(channel);
+          if (message === Lock.toReleased(resources)) {
             resolve(this.acquire(resources, ttl));
           }
         });
@@ -44,6 +61,6 @@ export class RedlockService {
 
   async release(lock: Lock): Promise<void> {
     await lock.release();
-    this.pubRedis.publish(lock.getChannel(), 'released');
+    this.pubRedis.publish(Lock.channel, Lock.toReleased(lock.resources));
   }
 }

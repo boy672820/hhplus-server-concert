@@ -1,13 +1,15 @@
-import { DynamicModule, Module } from '@nestjs/common';
+import { DynamicModule, Module, OnModuleDestroy } from '@nestjs/common';
 import { RedisModuleAsyncOptions, RedisModuleOptions } from './redis.interface';
 import {
   createAsyncRedisProvider,
   createRedisProvider,
 } from './redis.provider';
 import { REDIS_CLIENT } from './redis.token';
+import { InjectRedis } from './decorators';
+import { Redis } from 'ioredis';
 
 @Module({})
-export class RedisModule {
+export class RedisModule implements OnModuleDestroy {
   static register(options: RedisModuleOptions): DynamicModule {
     return {
       module: RedisModule,
@@ -23,5 +25,11 @@ export class RedisModule {
       providers: [createAsyncRedisProvider(options)],
       exports: [REDIS_CLIENT],
     };
+  }
+
+  constructor(@InjectRedis() private readonly redis: Redis) {}
+
+  async onModuleDestroy() {
+    await this.redis.quit();
   }
 }

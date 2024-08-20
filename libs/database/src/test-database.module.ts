@@ -13,6 +13,7 @@ import {
 } from 'typeorm-transactional';
 import { join } from 'path';
 import { OptimisticLockingSubscriber } from './optimistic-locking.subscriber';
+import { entities } from './entities';
 
 @Module({
   imports: [
@@ -28,7 +29,11 @@ import { OptimisticLockingSubscriber } from './optimistic-locking.subscriber';
         username: databaseConfig.username,
         password: databaseConfig.password,
         database: databaseConfig.database,
-        entities: [join(__dirname, '/../../**/*.entity{.ts,.js}')],
+        entities,
+        migrationsTableName: 'typeorm_migrations',
+        migrations: [
+          join(__dirname, '/../../../../typeorm/migrations/*{.ts,.js}'),
+        ],
         subscribers: [OptimisticLockingSubscriber],
         charset: 'utf8mb4_general_ci',
         logging: appConfig.nodeEnv === 'debug',
