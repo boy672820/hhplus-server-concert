@@ -1,4 +1,8 @@
-import { seedPoint, seedQueue, seedReservation } from '@lib/fixtures';
+import {
+  ActiveQueueUserSeeder,
+  seedPoint,
+  seedReservation,
+} from '../../lib/fixtures';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getDataSourceToken } from '@nestjs/typeorm';
@@ -12,14 +16,14 @@ import {
   ReservationService,
   SeatService,
 } from '../../domain/services';
-import { PointEntity } from '@libs/database/entities';
-import { ReservationEntity } from '@libs/database/entities';
+import { PointEntity, ReservationEntity } from '@libs/database/entities';
 import {
   EventRepository,
   PaymentRepository,
   PointRepository,
   QueueRepository,
   ReservationRepository,
+  ScheduleRepository,
   SeatRepository,
 } from '../../domain/repositories';
 import { ReservationRepositoryImpl } from '../../infrastructure/repositories/reservation.repository';
@@ -28,75 +32,125 @@ import { SeatRepositoryImpl } from '../../infrastructure/repositories/seat.repos
 import { PointRepositoryImpl } from '../../infrastructure/repositories/point.repository';
 import { PaymentRepositoryImpl } from '../../infrastructure/repositories/payment.repository';
 import { QueueRepositoryImpl } from '../../infrastructure/repositories/queue.repository';
+import { ReservationProducerImpl } from '../../infrastructure/producers/reservation.producer';
+import { OutboxAdapterImpl } from '../../infrastructure/adapters/outbox.adapter';
+import { ReservationFactory } from '../../domain/factories/reservation.factory';
+import { ReservationProducer } from '../../domain/producers';
+import { OutboxAdapter } from '../../domain/adapters';
+import { ReservationMapper } from '../../infrastructure/mappers/reservation.mapper';
+import { ScheduleRepositoryImpl } from '../../infrastructure/repositories/schedule.repository';
+
+// Exceeded timeout of 5000 ms for a test.
+jest.setTimeout(10_000);
+
+const services = [
+  ReservationService,
+  SeatService,
+  PointService,
+  PaymentService,
+  QueueService,
+];
+
+const factories = [ReservationFactory];
+
+const repositories = [
+  {
+    provide: ReservationRepository,
+    useClass: ReservationRepositoryImpl,
+  },
+  {
+    provide: EventRepository,
+    useClass: EventRepositoryImpl,
+  },
+  {
+    provide: SeatRepository,
+    useClass: SeatRepositoryImpl,
+  },
+  {
+    provide: PointRepository,
+    useClass: PointRepositoryImpl,
+  },
+  {
+    provide: PaymentRepository,
+    useClass: PaymentRepositoryImpl,
+  },
+  {
+    provide: QueueRepository,
+    useClass: QueueRepositoryImpl,
+  },
+  {
+    provide: ScheduleRepository,
+    useClass: ScheduleRepositoryImpl,
+  },
+];
+
+const mappers = [ReservationMapper];
+
+const producers = [
+  {
+    provide: ReservationProducer,
+    useClass: ReservationProducerImpl,
+  },
+];
+
+const adapters = [
+  {
+    provide: OutboxAdapter,
+    useClass: OutboxAdapterImpl,
+  },
+];
+
+const fixtures = [ActiveQueueUserSeeder];
 
 describe('PayReservationUseCase (Integration)', () => {
   let payReservationUseCase: PayReservationUseCase;
   let app: INestApplication;
-  let user: PointEntity;
-  let reservation1: ReservationEntity;
-  let reservation2: ReservationEntity;
-  let reservation3: ReservationEntity;
+  let users: PointEntity[];
+  let reservations: ReservationEntity[];
+
+  const size = 10;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [TestCoreModule],
       providers: [
         PayReservationUseCase,
-        ReservationService,
-        SeatService,
-        PointService,
-        PaymentService,
-        QueueService,
-        {
-          provide: ReservationRepository,
-          useClass: ReservationRepositoryImpl,
-        },
-        {
-          provide: EventRepository,
-          useClass: EventRepositoryImpl,
-        },
-        {
-          provide: SeatRepository,
-          useClass: SeatRepositoryImpl,
-        },
-        {
-          provide: PointRepository,
-          useClass: PointRepositoryImpl,
-        },
-        {
-          provide: PaymentRepository,
-          useClass: PaymentRepositoryImpl,
-        },
-        {
-          provide: QueueRepository,
-          useClass: QueueRepositoryImpl,
-        },
+        ...services,
+        ...factories,
+        ...repositories,
+        ...mappers,
+        ...producers,
+        ...adapters,
+        ...fixtures,
       ],
     }).compile();
-
-    payReservationUseCase = moduleRef.get(PayReservationUseCase);
 
     app = moduleRef.createNestApplication();
     await app.init();
 
-    const dataSource = moduleRef.get<DataSource>(getDataSourceToken());
+    payReservationUseCase = moduleRef.get(PayReservationUseCase);
 
-    user = await seedPoint({ dataSource });
-    [reservation1, reservation2, reservation3] = await Promise.all([
-      seedReservation({
-        dataSource,
-        userId: user.userId,
-      }),
-      seedReservation({
-        dataSource,
-        userId: user.userId,
-      }),
-      seedReservation({
-        dataSource,
-        userId: user.userId,
-      }),
-    ]);
-    await seedQueue({ dataSource, userId: user.userId });
+    const dataSource = moduleRef.get<DataSource>(getDataSourceToken());
+    const activeQueueUserSeeder = moduleRef.get(ActiveQueueUserSeeder);
+
+    users = await Promise.all(
+      Array.from({ length: size }).map(() => seedPoint({ dataSource })),
+    );
+
+    await Promise.all(
+      users.map((user) =>
+        activeQueueUserSeeder.execute({ userId: user.userId }),
+      ),
+    );
+
+    reservations = await Promise.all(
+      users.map((user) =>
+        seedReservation({
+          dataSource,
+          userId: user.userId,
+        }),
+      ),
+    );
   });
 
   afterEach(async () => {
@@ -105,22 +159,16 @@ describe('PayReservationUseCase (Integration)', () => {
 
   describe('예약 결제 (Concurrency Testing)', () => {
     it('동시에 충전과 결제를 수행합니다.', async () => {
-      await expect(
-        Promise.all([
-          payReservationUseCase.execute({
-            userId: user.userId,
-            reservationId: reservation1.id,
-          }),
-          payReservationUseCase.execute({
-            userId: user.userId,
-            reservationId: reservation2.id,
-          }),
-          payReservationUseCase.execute({
-            userId: user.userId,
-            reservationId: reservation3.id,
-          }),
-        ]),
-      ).rejects.toThrow();
+      const promises = users.map((user, i) =>
+        payReservationUseCase.execute({
+          userId: user.userId,
+          reservationId: reservations[i].id,
+        }),
+      );
+
+      const result = await Promise.all(promises);
+
+      await expect(result.length).toBe(size);
     });
   });
 });

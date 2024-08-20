@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { DynamicModule, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { validate } from './env.validator';
 
@@ -11,4 +11,21 @@ import { validate } from './env.validator';
     }),
   ],
 })
-export class GlobalConfigModule {}
+export class GlobalConfigModule {
+  static forRoot({
+    envFilePath,
+  }: {
+    envFilePath: string | string[];
+  }): DynamicModule {
+    return {
+      module: GlobalConfigModule,
+      imports: [
+        ConfigModule.forRoot({
+          isGlobal: true,
+          envFilePath,
+          validate,
+        }),
+      ],
+    };
+  }
+}

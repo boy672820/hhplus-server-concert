@@ -10,14 +10,18 @@ import { RedlockModule } from '@libs/redlock';
 import { KafkaClientModule } from '@libs/kafka-client';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { CqrsModule } from '@nestjs/cqrs';
 import { DomainExceptionFilter } from './domain-exception.filter';
 import { LoggingInterceptor } from './logging.interceptor';
 
 @Module({
   imports: [
-    GlobalConfigModule,
+    GlobalConfigModule.forRoot({
+      envFilePath: ['.env.test.local', '.env.test'],
+    }),
     CqrsModule,
+    ScheduleModule.forRoot(),
     TestDatabaseModule,
     RedlockModule,
     LoggerModule,
@@ -60,9 +64,10 @@ import { LoggingInterceptor } from './logging.interceptor';
   ],
   exports: [
     RedlockModule,
-    RedisModule,
     CqrsModule,
     MockApiModule,
+    RedisModule,
+    KafkaClientModule,
     OutboxModule,
   ],
 })

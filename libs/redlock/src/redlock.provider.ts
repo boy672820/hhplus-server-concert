@@ -1,7 +1,7 @@
 import { RedisConfigService } from '@libs/config/redis';
 import { Provider } from '@nestjs/common';
 import { Redis } from 'ioredis';
-import Redlock from 'redlock';
+import * as Redlock from 'redlock';
 
 export const REDIS_PROVIDER = Symbol('REDIS_PROVIDER');
 export const SUBREDIS_PROVIDER = Symbol('SUBREDIS_PROVIDER');
