@@ -1,5 +1,5 @@
 import { ScheduleEntity } from '@libs/database/entities';
-import { LocalDateTime } from '@libs/domain/types';
+import { LocalDateTime, ScheduleStatus } from '@libs/domain/types';
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
@@ -42,14 +42,14 @@ export class ScheduleRepositoryImpl implements ScheduleRepository {
       .createQueryBuilder(ScheduleEntity, 'schedule')
       .select(['id', 'startDate', 'endDate'])
       .where('schedule.eventId = :eventId', { eventId })
+      .andWhere('schedule.status = :status')
       .andWhere('schedule.startDate >= :startDate')
       .andWhere('schedule.endDate <= :endDate')
-      // .andWhere('schedule.status >= :status')
       .setParameters({
         eventId,
         startDate: between.startDate.toDate('Asia/Seoul'),
         endDate: between.endDate.toDate('Asia/Seoul'),
-        // status: ScheduleStatus.Active,
+        status: ScheduleStatus.Active,
       })
       .getRawMany();
     return entities.map(ScheduleMapper.toModel);
