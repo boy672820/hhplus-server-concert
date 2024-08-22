@@ -39,6 +39,7 @@ import { ReservationProducer } from '../../domain/producers';
 import { OutboxAdapter } from '../../domain/adapters';
 import { ReservationMapper } from '../../infrastructure/mappers/reservation.mapper';
 import { ScheduleRepositoryImpl } from '../../infrastructure/repositories/schedule.repository';
+import { DomainError } from '../../../../../libs/common/src/errors';
 
 // Exceeded timeout of 5000 ms for a test.
 jest.setTimeout(10_000);
@@ -107,6 +108,7 @@ describe('PayReservationUseCase (Integration)', () => {
   let app: INestApplication;
   let users: PointEntity[];
   let reservations: ReservationEntity[];
+  let onlyOneReservation: ReservationEntity;
 
   const size = 10;
 
@@ -151,6 +153,11 @@ describe('PayReservationUseCase (Integration)', () => {
         }),
       ),
     );
+
+    onlyOneReservation = await seedReservation({
+      dataSource,
+      userId: users[0].userId,
+    });
   });
 
   afterEach(async () => {
@@ -169,6 +176,19 @@ describe('PayReservationUseCase (Integration)', () => {
       const result = await Promise.all(promises);
 
       await expect(result.length).toBe(size);
+    });
+
+    it('동시에 같은 예약을 결제하려고 할 때, 하나의 결제만 성공해야 합니다.', async () => {
+      const promises = [users[0], users[0], users[0]].map((user) =>
+        payReservationUseCase.execute({
+          userId: user.userId,
+          reservationId: onlyOneReservation.id,
+        }),
+      );
+
+      await expect(Promise.all(promises)).rejects.toThrow(
+        DomainError.conflict('이미 결제된 좌석입니다.'),
+      );
     });
   });
 });
