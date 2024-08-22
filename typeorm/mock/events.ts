@@ -1,11 +1,14 @@
-import { LocalDateTime } from '../../src/lib/types';
+import { LocalDateTime, ScheduleStatus } from '@libs/domain/types';
+import {
+  EventEntity,
+  ScheduleEntity,
+  SeatEntity,
+} from '@libs/database/entities';
 import { faker } from '@faker-js/faker';
 import { LocalDate, LocalTime } from '@js-joda/core';
 import { ulid } from 'ulid';
 import Decimal from 'decimal.js';
-import { ScheduleEntity } from '../../src/infrastructure/entities/schedule.entity';
-import { SeatEntity } from '../../src/infrastructure/entities/seat.entity';
-import { EventEntity } from '../../src/infrastructure/entities/event.entity';
+import { randomInt } from 'crypto';
 
 const now = LocalDateTime.now();
 const localDate = LocalDate.now();
@@ -44,12 +47,14 @@ const createEvent = (): EventEntity =>
     updatedDate: now,
   });
 
-const createSchedule = (event: EventEntity): ScheduleEntity =>
+const scheduleStatusValues = Object.values(ScheduleStatus);
+const createScheduleForRandomStatus = (event: EventEntity): ScheduleEntity =>
   ScheduleEntity.of({
     id: ulid(),
     startDate: createStartDate(),
     endDate: createEndDate(),
     event: event,
+    status: scheduleStatusValues[randomInt(0, scheduleStatusValues.length - 1)],
   });
 
 const createSeat = (
@@ -66,12 +71,12 @@ const createSeat = (
   });
 
 // 인터파크의 총 상품 수는 278개입니다. (2024.07.31 기준)
-export const events: EventEntity[] = Array.from({ length: 277 }, () =>
+export const events: EventEntity[] = Array.from({ length: 300 }, () =>
   createEvent(),
 );
 
 export const schedules: ScheduleEntity[] = events.flatMap((event) =>
-  Array.from({ length: 5 }, () => createSchedule(event)),
+  Array.from({ length: 5 }, () => createScheduleForRandomStatus(event)),
 );
 
 export const seats: SeatEntity[] = schedules.flatMap((schedule) =>

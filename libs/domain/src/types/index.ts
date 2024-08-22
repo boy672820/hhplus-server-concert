@@ -7,4 +7,4 @@ export * from './QueueStatus';
 export * from './ScheduleStatus';
 export * from './TransactionStatus';
 export * from './EventType';
-export * from './QueueuserStatus';
+export * from './QueueUserStatus';
