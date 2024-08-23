@@ -41,7 +41,7 @@ header: hh+
 
 # 목차
 
-1. 가장 재밌었던 8주차: 부하 축소하기
+1. 가장 기억에 남은 8주차: 부하 축소하기
 2. Query Optimization을 통한 대용량 데이터 다루기[^#33]
 3. Before & After
 4. 마무리
@@ -50,7 +50,7 @@ header: hh+
 
 ---
 
-# 1. 가장 재밌었던 8주차
+# 1. 가장 기억에 남은 8주차
 
 부하 축소하기
 
@@ -250,6 +250,7 @@ flowchart LR
 
 1) 인덱스를 사용하지 않는다 (?)
 2) Covering Index
+3) 조회 조건 추가
 
 ---
 
@@ -264,9 +265,372 @@ flowchart LR
 * 1,000만 건의 데이터 조회
 * 쿼리 수행 시간: 3.9s ---> ?????;;
   ![](./find-available-schedule-covering.png)
-  * (더 좋은 방법은 아직 찾지 못했습니다 ㅠ)
 
 ---
+
+## 성능 개선: 공연 일정 조회
+
+##### 조회 조건 추가하기
+
+기존 조회 조건 `eventId = ? AND startDate > ? AND endDate < ?`입니다.
+여기서 `status = ?` 조건을 추가하여 최대한 범위 스캔(`startDate > ? AND endDate < ?`)할 데이터를 줄이는 것도 방법이겠지요.
+
+```sql
+CREATE INDEX idx_covering ON schedule(eventId, status, startDate, endDate, id);
+
+SELECT id, eventId, status, startDate, endDate
+FROM schedule
+WHERE eventId = ?
+  AND status = ?
+  AND startDate > ?
+  AND endDate < ?
+```
+
+---
+
+# 3. Before & After
+
+자가진단 및 평가
+
+---
+
+<!-- _class: self-diagnosis -->
+
+## 자가진단표
+
+<style>
+  section.self-diagnosis table {
+    color: black;
+    font-size: 12px;
+  }
+  section.self-diagnosis .border.top.blue {
+    border-top: 2px solid blue;
+  }
+  section.self-diagnosis .border.bottom.blue {
+    border-bottom: 2px solid blue;
+  }
+  section.self-diagnosis .border.left.blue {
+    border-left: 2px solid blue;
+  }
+  section.self-diagnosis .border.right.blue {
+    border-right: 2px solid blue;
+  }
+  section.self-diagnosis .border.top.red {
+    border-top: 2px solid red;
+  }
+  section.self-diagnosis .border.bottom.red {
+    border-bottom: 2px solid red;
+  }
+  section.self-diagnosis .border.left.red {
+    border-left: 2px solid red;
+  }
+  section.self-diagnosis .border.right.red {
+    border-right: 2px solid red;
+  }
+</style>
+
+<table>
+  <thead>
+    <tr>
+      <th rowspan=2></th>
+      <th rowspan=2>평가 항목</th>
+      <th colspan=11>점수 (⚫️: 항해 전 / 🔴: 항해 후)</th>
+    </tr>
+    <tr>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+      <th>5</th>
+      <th>6</th>
+      <th>7</th>
+      <th>8</th>
+      <th>9</th>
+      <th>10</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="border top left blue">1</td>
+      <td class="border top blue">TDD의 이해 및 테스트 코드 작성 능력</td>
+      <td class="border top blue">⚪️</td>
+      <td class="border top blue">⚪️</td>
+      <td class="border top blue">⚪️</td>
+      <td class="border top blue">⚫️</td>
+      <td class="border top blue">⚪️</td>
+      <td class="border top blue">⚪️</td>
+      <td class="border top blue">🔴</td>
+      <td class="border top blue">⚪️</td>
+      <td class="border top blue">⚪️</td>
+      <td class="border top blue">⚪️</td>
+      <td class="border top right blue">⚪️</td>
+    </tr>
+    <tr>
+      <td class="border bottom left blue">2</td>
+      <td class="border bottom blue">레이어드 아키텍처 이해</td>
+      <td class="border bottom blue">⚪️</td>
+      <td class="border bottom blue">⚪️</td>
+      <td class="border bottom blue">⚫️</td>
+      <td class="border bottom blue">⚪️</td>
+      <td class="border bottom blue">⚪️</td>
+      <td class="border bottom blue">🔴</td>
+      <td class="border bottom blue">⚪️</td>
+      <td class="border bottom blue">⚪️</td>
+      <td class="border bottom blue">⚪️</td>
+      <td class="border bottom blue">⚪️</td>
+      <td class="border bottom right blue">⚪️</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Mileston/ERD/Spec/Sequence 등 문서 작성 능력</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚫️</td>
+      <td>🔴</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Github Actions, ECR 등 CI/CD 구축 능력</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚫️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>비즈니스 로직을 이해하고 설계 및 구현하는 능력</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚫️</td>
+      <td>🔴</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+    </tr>
+    <tr>
+      <td class="border top left blue">6</td>
+      <td class="border top blue">예외 처리, 로깅 등 유효한 부가로직의 구현 능력</td>
+      <td class="border top blue">⚪️</td>
+      <td class="border top blue">⚪️</td>
+      <td class="border top blue">⚫️</td>
+      <td class="border top blue">⚪️</td>
+      <td class="border top blue">🔴</td>
+      <td class="border top blue">⚪️</td>
+      <td class="border top blue">⚪️</td>
+      <td class="border top blue">⚪️</td>
+      <td class="border top blue">⚪️</td>
+      <td class="border top blue">⚪️</td>
+      <td class="border top right blue">⚪️</td>
+    </tr>
+    <tr>
+      <td class="border left blue">7</td>
+      <td>DB 동시성 제어 및 트랜잭션 처리 능력</td>
+      <td>⚪️</td>
+      <td>⚫️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>🔴</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td class="border right blue">⚪️</td>
+    </tr>
+    <tr>
+      <td class="border left blue">8</td>
+      <td>대량의 트래픽 처리를 위한 캐싱 및 비동기 처리 능력</td>
+      <td>⚫️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>🔴</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td class="border right blue">⚪️</td>
+    </tr>
+    <tr>
+      <td class="border bottom left blue">9</td>
+      <td class="border bottom blue">성능 개선을 위한 인덱싱, 쿼리 최적화 능력</td>
+      <td class="border bottom blue">⚪️</td>
+      <td class="border bottom blue">⚫️</td>
+      <td class="border bottom blue">⚪️</td>
+      <td class="border bottom blue">⚪️</td>
+      <td class="border bottom blue">🔴</td>
+      <td class="border bottom blue">⚪️</td>
+      <td class="border bottom blue">⚪️</td>
+      <td class="border bottom blue">⚪️</td>
+      <td class="border bottom blue">⚪️</td>
+      <td class="border bottom blue">⚪️</td>
+      <td class="border bottom right blue">⚪️</td>
+    </tr>
+    <tr>
+      <td>
+      <td>
+      <td>
+      <td>
+      <td>
+      <td>
+      <td>
+      <td>
+      <td>
+      <td>
+      <td>
+      <td>
+      <td>
+    </tr>
+    <tr>
+      <td class="border top left red">10</td>
+      <td class="border top red">카프카를 이용한 서비스 확장 능력</td>
+      <td class="border top red">⚫️</td>
+      <td class="border top red">⚪️</td>
+      <td class="border top red">🔴</td>
+      <td class="border top red">⚪️</td>
+      <td class="border top red">⚪️</td>
+      <td class="border top red">⚪️</td>
+      <td class="border top red">⚪️</td>
+      <td class="border top red">⚪️</td>
+      <td class="border top red">⚪️</td>
+      <td class="border top red">⚪️</td>
+      <td class="border top right red">⚪️</td>
+    </tr>
+    <tr>
+      <td class="border left red">11</td>
+      <td>부하 테스트 및 성능 분석 능력</td>
+      <td>⚫️</td>
+      <td>⚪️</td>
+      <td>🔴</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td>⚪️</td>
+      <td class="border right red">⚪️</td>
+    </tr>
+    <tr>
+      <td class="border bottom left red">12</td>
+      <td class="border bottom red">로깅 및 모니터링을 위한 도구 사용 능력</td>
+      <td class="border bottom red">⚫️</td>
+      <td class="border bottom red">🔴</td>
+      <td class="border bottom red">⚪️</td>
+      <td class="border bottom red">⚪️</td>
+      <td class="border bottom red">⚪️</td>
+      <td class="border bottom red">⚪️</td>
+      <td class="border bottom red">⚪️</td>
+      <td class="border bottom red">⚪️</td>
+      <td class="border bottom red">⚪️</td>
+      <td class="border bottom red">⚪️</td>
+      <td class="border bottom right red">⚪️</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td align=right>총합:</td>
+      <th colspan=11>⚫️ 23 / 🔴 48</th>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## 자가진단표
+
+##### 🟦 발전을 이룬 항목
+ 
+- 사전 스터디 진행
+- 어느정도 기반이 다져진 지식
+
+##### 🟥 아쉬운 항목
+
+ - 컨디션 관리 실패
+ - 접해보지 못한 기술 또는 지식
+ - 문서 작성 능력 부족
+
+---
+
+## 목표 점검
+
+##### 시작하는 마음 (1주차) [^post]
+
+ * 10주간 모든 과제를 완료하기 (달성률: 90%)
+ * 커뮤니티 적극 참여하기 (팀장했으니깐.. 50%?)
+
+[^post]: https://velog.io/@boy672820/%EC%8B%9C%EC%9E%91%ED%95%98%EB%8A%94-%EB%A7%88%EC%9D%8C
+
+---
+
+## 종합 평가
+
+ChatGPT 한테 물어봤습니다.
+
+##### 목표 달성
+
+* 주어진 과제를 성실히 수행하였으며, 지속적인 학습 태도와 시간 관리 능력이 뛰어났음을 보여줍니다.
+* 단, 커뮤니티 참여는 상대적으로 낮은 편입니다. 팀장 역할을 수행하면서도 더 적극적으로 참여할 수 있는 여지가 있었다고 보입니다.
+
+##### 결론
+
+* 학습자는 10주간의 과정에서 상당한 기술적 성장을 이루었습니다.
+  특히, TDD, 아키텍처 이해, 비즈니스 로직 설계 등의 영역에서 큰 발전을 보였습니다.
+* 반면, 성능 최적화, 트랜잭션 관리, 대량 트래픽 처리 등의 고급 기술에서는 추가 학습이 필요합니다. 커뮤니티 참여도 개선의 여지가 있습니다.
+
+---
+
+# 4. 마무리
+
+10주간의 항해를 마치며
+
+---
+
+## 정리
+
+##### 기억에 남은 이슈
+
+* 대량의 데이터를 조회할 때 인덱스를 사용하면 오히려 성능이 저하될 수 있음
+  * (개선 방법: Covering Index, 최대한 적은 데이터를 불러오도록 status 등 조건 추가)
+
+##### 얼마나 성장했는지
+
+* TDD, 아키텍처 이해, 비즈니스 로직 설계 등의 영역에서 큰 발전을 보임
+
+##### 아쉬운 점
+
+* 성능 최적화, 대량 트래픽 처리 등의 추가 학습이 필요
+* 커뮤니케이션에 있어서 적극적인 참여가 필요
+
+---
+
+## 항해를 마치며
+
+10주 동안 혼자였다면 완주하지 못했을 것입니다.
+
+다른 분들과의 소통을 통해 얻은 아이디어들이 저에게 큰 도움이 되었습니다.
+
+항해를 마치며, 함께한 모든 분들이 앞으로도 건승하시길 바랍니다. 👏
+
 
 <!-- mermaid.js -->
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
