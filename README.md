@@ -1,10 +1,6 @@
 # 콘서트 예약 서비스
 
 <p align="center">
-  <img src="./logo.webp" />
-</p>
-
-<p align="center">
   항해 플러스 백엔드 5기 (19조).
 </p>
 
