@@ -1,17 +1,12 @@
 # 콘서트 예약 서비스
 
-<p align="center">
-  항해 플러스 백엔드 5기 (19조).
-</p>
-
-
 - `콘서트 예약 서비스`를 구현해 봅니다.
 - 대기열 시스템을 구축하고, 예약 서비스는 작업가능한 유저만 수행할 수 있도록 해야합니다.
 - 사용자는 좌석예약 시에 미리 충전한 잔액을 이용합니다.
 - 좌석 예약 요청시에, 결제가 이루어지지 않더라도 일정 시간동안 다른 유저가 해당 좌석에 접근할 수 없도록 합니다.
 
->[!NOTE]
->프로젝트 일정은 <a href="https://github.com/users/boy672820/projects/4">Github Projects</a>에서 확인하실 수 있습니다.
+> [!NOTE]
+> 프로젝트 일정은 <a href="https://github.com/users/boy672820/projects/4">Github Projects</a>에서 확인하실 수 있습니다.
 
 ## 요구사항
 
@@ -28,12 +23,12 @@
 
 ## 관련 기술 문서
 
- - [API 명세서](./docs/api-spec.md)
- - [동시성 문제 분석](docs/concurrency-problems.md)
- - [성능 개선](docs/performance.md)
- - [쿼리 성능 개선(Query Optimization)](docs/query-optimization.md)
- - [MSA 설계](docs/msa.md)
- - [장애 대응](docs/load-testing.md)
+- [API 명세서](./docs/api-spec.md)
+- [동시성 문제 분석](docs/concurrency-problems.md)
+- [성능 개선](docs/performance.md)
+- [쿼리 성능 개선(Query Optimization)](docs/query-optimization.md)
+- [MSA 설계](docs/msa.md)
+- [장애 대응](docs/load-testing.md)
 
 ## 목차
 
