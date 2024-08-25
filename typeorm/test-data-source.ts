@@ -1,7 +1,8 @@
+import { entities } from '@libs/database/entities';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { SeederOptions } from 'typeorm-extension';
-import { config } from './test-config';
 import { join } from 'path';
+import { config } from './test-config';
 
 const options: DataSourceOptions & SeederOptions = {
   type: config.database.type,
@@ -15,7 +16,7 @@ const options: DataSourceOptions & SeederOptions = {
   synchronize: false,
   seeds: ['typeorm/seeds/**/*{.ts,.js}'],
   factories: ['typeorm/factories/**/*{.ts,.js}'],
-  entities: ['src/**/*.entity{.ts,.js}'],
+  entities,
 };
 
 export const dataSource = new DataSource(options);

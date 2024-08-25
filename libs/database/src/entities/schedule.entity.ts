@@ -8,10 +8,11 @@ interface Schedule {
   startDate: LocalDateTime;
   endDate: LocalDateTime;
   event: EventEntity;
+  status?: ScheduleStatus;
 }
 
 @Entity('schedule')
-@Index(['event', 'startDate', 'endDate', 'id'])
+@Index(['event', 'status', 'startDate', 'endDate', 'id'])
 export class ScheduleEntity {
   @PrimaryUlid()
   id: string;

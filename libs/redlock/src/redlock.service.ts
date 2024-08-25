@@ -12,6 +12,8 @@ import {
   REDLOCK_PROVIDER,
   SUBREDIS_PROVIDER,
 } from './redlock.provider';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 @Injectable()
 export class RedlockService implements OnModuleInit, OnModuleDestroy {
@@ -19,6 +21,7 @@ export class RedlockService implements OnModuleInit, OnModuleDestroy {
     @Inject(REDLOCK_PROVIDER) private readonly redlock: Redlock,
     @Inject(SUBREDIS_PROVIDER) private readonly subRedis: Redis,
     @Inject(PUBREDIS_PROVIDER) private readonly pubRedis: Redis,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
   async onModuleInit() {
@@ -47,6 +50,7 @@ export class RedlockService implements OnModuleInit, OnModuleDestroy {
       return new Promise((resolve, reject) => {
         const timeout = setTimeout(() => {
           clearTimeout(timeout);
+          this.logger.error('[RedlockService] Acquire timeout', e);
           reject(e);
         }, 1000);
 

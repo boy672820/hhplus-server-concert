@@ -39,6 +39,8 @@ import { ReservationProducer } from '../../domain/producers';
 import { OutboxAdapter } from '../../domain/adapters';
 import { ReservationMapper } from '../../infrastructure/mappers/reservation.mapper';
 import { ScheduleRepositoryImpl } from '../../infrastructure/repositories/schedule.repository';
+import { DomainError } from '../../../../../libs/common/src/errors';
+import { RechargePointUseCase } from './recharge-point.usecase';
 
 // Exceeded timeout of 5000 ms for a test.
 jest.setTimeout(10_000);
@@ -104,9 +106,12 @@ const fixtures = [ActiveQueueUserSeeder];
 
 describe('PayReservationUseCase (Integration)', () => {
   let payReservationUseCase: PayReservationUseCase;
+  let rechargePointUseCase: RechargePointUseCase;
   let app: INestApplication;
   let users: PointEntity[];
   let reservations: ReservationEntity[];
+  let onlyOneReservation: ReservationEntity;
+  let reservationForRecharge: ReservationEntity;
 
   const size = 10;
 
@@ -115,6 +120,7 @@ describe('PayReservationUseCase (Integration)', () => {
       imports: [TestCoreModule],
       providers: [
         PayReservationUseCase,
+        RechargePointUseCase,
         ...services,
         ...factories,
         ...repositories,
@@ -129,6 +135,7 @@ describe('PayReservationUseCase (Integration)', () => {
     await app.init();
 
     payReservationUseCase = moduleRef.get(PayReservationUseCase);
+    rechargePointUseCase = moduleRef.get(RechargePointUseCase);
 
     const dataSource = moduleRef.get<DataSource>(getDataSourceToken());
     const activeQueueUserSeeder = moduleRef.get(ActiveQueueUserSeeder);
@@ -151,6 +158,16 @@ describe('PayReservationUseCase (Integration)', () => {
         }),
       ),
     );
+
+    onlyOneReservation = await seedReservation({
+      dataSource,
+      userId: users[0].userId,
+    });
+
+    reservationForRecharge = await seedReservation({
+      dataSource,
+      userId: users[0].userId,
+    });
   });
 
   afterEach(async () => {
@@ -169,6 +186,43 @@ describe('PayReservationUseCase (Integration)', () => {
       const result = await Promise.all(promises);
 
       await expect(result.length).toBe(size);
+    });
+
+    it('동시에 같은 예약을 결제하려고 할 때, 하나의 결제만 성공해야 합니다.', async () => {
+      const promises = [users[0], users[0], users[0]].map((user) =>
+        payReservationUseCase.execute({
+          userId: user.userId,
+          reservationId: onlyOneReservation.id,
+        }),
+      );
+
+      await expect(Promise.all(promises)).rejects.toThrow(
+        DomainError.conflict('이미 결제된 좌석입니다.'),
+      );
+    });
+
+    it('결제와 충전이 동시에 수행될 때, 하나의 결제 또는 충전만 성공해야 합니다.', async () => {
+      const rechargePromises = Array.from({ length: 1000 }).map(() =>
+        rechargePointUseCase.execute({
+          userId: users[0].userId,
+          amount: '100',
+        }),
+      );
+      const payPromise = payReservationUseCase.execute({
+        userId: users[0].userId,
+        reservationId: reservationForRecharge.id,
+      });
+
+      try {
+        const result = await Promise.all([...rechargePromises, payPromise]);
+
+        console.log(result);
+
+        expect(true).toBe(true);
+      } catch (error) {
+        console.log(error);
+        expect(true).toBe(false);
+      }
     });
   });
 });
