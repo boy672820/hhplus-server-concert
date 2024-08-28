@@ -38,7 +38,9 @@
       "@libs/logger": ["libs/logger/src"],
       "@libs/logger/*": ["libs/logger/src/*"],
       "@libs/kafka-client": ["libs/kafka-client/src"],
-      "@libs/kafka-client/*": ["libs/kafka-client/src/*"]
+      "@libs/kafka-client/*": ["libs/kafka-client/src/*"],
+      "@libs/opensearch": ["libs/opensearch/src"],
+      "@libs/opensearch/*": ["libs/opensearch/src/*"]
     }
   }
 }

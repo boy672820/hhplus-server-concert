@@ -19,6 +19,8 @@ export enum EnvKey {
   DATABASE_PORT = 'DATABASE_PORT',
   DATABASE_USERNAME = 'DATABASE_USERNAME',
   DATABASE_PASSWORD = 'DATABASE_PASSWORD',
+
+  OPENSEARCH_URL = 'OPENSEARCH_URL',
 }
 
 class EnviromentVariables {
@@ -44,6 +46,10 @@ class EnviromentVariables {
   @IsString()
   @IsNotEmpty()
   DATABASE_PASSWORD: string;
+
+  @IsString()
+  @IsNotEmpty()
+  OPENSEARCH_URL: string;
 }
 
 export function validate(config: Record<string, unknown>) {
