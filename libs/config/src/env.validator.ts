@@ -19,6 +19,12 @@ export enum EnvKey {
   DATABASE_PORT = 'DATABASE_PORT',
   DATABASE_USERNAME = 'DATABASE_USERNAME',
   DATABASE_PASSWORD = 'DATABASE_PASSWORD',
+
+  REDIS_HOST = 'REDIS_HOST',
+  REDIS_PORT = 'REDIS_PORT',
+
+  KAFKA_HOST = 'KAFKA_HOST',
+  KAFKA_PORT = 'KAFKA_PORT',
 }
 
 class EnviromentVariables {
@@ -44,6 +50,18 @@ class EnviromentVariables {
   @IsString()
   @IsNotEmpty()
   DATABASE_PASSWORD: string;
+
+  @IsString()
+  @IsNotEmpty()
+  REDIS_HOST: string;
+  @IsNumber()
+  REDIS_PORT: number;
+
+  @IsString()
+  @IsNotEmpty()
+  KAFKA_HOST: string;
+  @IsNumber()
+  KAFKA_PORT: number;
 }
 
 export function validate(config: Record<string, unknown>) {
