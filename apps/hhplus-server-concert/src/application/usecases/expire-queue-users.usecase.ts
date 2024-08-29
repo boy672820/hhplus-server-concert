@@ -1,18 +1,21 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { Logger } from 'winston';
+import { InjectLogger } from '@libs/logger/decorators';
+import { Injectable } from '@nestjs/common';
+import { LoggerService } from '@libs/logger';
 import { QueueService } from '../../domain/services';
 
 @Injectable()
 export class ExpireQueueUsersUseCase {
   constructor(
     private readonly queueService: QueueService,
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+    @InjectLogger() private readonly logger: LoggerService,
   ) {}
 
   async execute(): Promise<void> {
     const { count } = await this.queueService.expireQueueUsers();
 
-    this.logger.info(`Expired queue users: ${count}`);
+    this.logger.info(
+      `Expired queue users: ${count}`,
+      'ExpireQueueUsersUseCase',
+    );
   }
 }

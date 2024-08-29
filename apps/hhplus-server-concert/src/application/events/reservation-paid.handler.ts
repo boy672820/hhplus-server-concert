@@ -1,8 +1,7 @@
 import { MockApiService } from '@libs/mock-api';
-import { Inject } from '@nestjs/common';
+import { InjectLogger } from '@libs/logger/decorators';
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { Logger } from 'winston';
+import { LoggerService } from '@libs/logger';
 import { ReservationPaidEvent } from '../../domain/events';
 
 @EventsHandler(ReservationPaidEvent)
@@ -10,7 +9,7 @@ export class ReservationPaidHandler
   implements IEventHandler<ReservationPaidEvent>
 {
   constructor(
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+    @InjectLogger() private readonly logger: LoggerService,
     private readonly mockApiService: MockApiService,
   ) {}
 

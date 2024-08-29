@@ -1,7 +1,6 @@
-import { Inject } from '@nestjs/common';
+import { InjectLogger } from '@libs/logger/decorators';
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
-import { Logger } from 'winston';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { LoggerService } from '@libs/logger';
 import { ReservationReservedSeatEvent } from '../../domain/events';
 import { ReservationService } from '../../domain/services';
 
@@ -10,7 +9,7 @@ export class ReservationReservedSeatHandler
   implements IEventHandler<ReservationReservedSeatEvent>
 {
   constructor(
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+    @InjectLogger() private readonly logger: LoggerService,
     private readonly reservationService: ReservationService,
   ) {}
 

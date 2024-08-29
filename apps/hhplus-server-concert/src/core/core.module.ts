@@ -1,4 +1,5 @@
 import { GlobalConfigModule } from '@libs/config';
+import { AppConfigModule, AppConfigService } from '@libs/config/app';
 import { RedisConfigModule, RedisConfigService } from '@libs/config/redis';
 import { KafkaConfigModule, KafkaConfigService } from '@libs/config/kafka';
 import {
@@ -6,7 +7,6 @@ import {
   OpenSearchConfigService,
 } from '@libs/config/opensearch';
 import { DatabaseModule } from '@libs/database';
-import { OpenSearchModule } from '@libs/opensearch';
 import { LoggerModule } from '@libs/logger';
 import { OutboxModule } from '@libs/outbox';
 import { RedisModule } from '@libs/redis';
@@ -27,8 +27,20 @@ import { LoggingInterceptor } from './logging.interceptor';
     ScheduleModule.forRoot(),
     DatabaseModule,
     RedlockModule,
-    LoggerModule,
     MockApiModule,
+    LoggerModule.forRootAsync({
+      global: true,
+      imports: [OpenSearchConfigModule, AppConfigModule],
+      useFactory: (
+        opensearchConfig: OpenSearchConfigService,
+        appConfig: AppConfigService,
+      ) => ({
+        opensearchUrl: opensearchConfig.url,
+        appName: 'ConcertService',
+        environment: appConfig.nodeEnv,
+      }),
+      inject: [OpenSearchConfigService, AppConfigService],
+    }),
     RedisModule.registerAsync({
       imports: [RedisConfigModule],
       useFactory: (redisConfig: RedisConfigService) => ({
@@ -36,13 +48,6 @@ import { LoggingInterceptor } from './logging.interceptor';
         port: redisConfig.port,
       }),
       inject: [RedisConfigService],
-    }),
-    OpenSearchModule.reigsterAsync({
-      imports: [OpenSearchConfigModule],
-      useFactory: (opensearchConfig: OpenSearchConfigService) => ({
-        url: opensearchConfig.url,
-      }),
-      inject: [OpenSearchConfigService],
     }),
     KafkaClientModule.registerAsync({
       imports: [KafkaConfigModule],

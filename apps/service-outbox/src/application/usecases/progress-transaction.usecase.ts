@@ -7,7 +7,7 @@ import { OutboxService } from '../../domain/services';
 export class ProgressTransactionUseCase {
   constructor(
     private readonly outboxService: OutboxService,
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+    @InjectLogger() private readonly logger: LoggerService,
   ) {}
 
   async execute({ transactionId }: { transactionId: string }): Promise<void> {

@@ -1,6 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { Logger } from 'winston';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { InjectLogger } from '@libs/logger/decorators';
+import { Injectable } from '@nestjs/common';
+import { LoggerService } from '@libs/logger';
 import { ReservationService } from '../../domain/services';
 import { Reservation } from '../../domain/models';
 
@@ -8,7 +8,7 @@ import { Reservation } from '../../domain/models';
 export class ReserveUseCase {
   constructor(
     private readonly reservationService: ReservationService,
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+    @InjectLogger() private readonly logger: LoggerService,
   ) {}
 
   async execute({

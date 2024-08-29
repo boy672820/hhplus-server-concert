@@ -1,6 +1,8 @@
 import { EventType } from '@libs/domain/types';
 import { DomainError } from '@libs/common/errors';
-import { Inject, Injectable } from '@nestjs/common';
+import { LoggerService } from '@libs/logger';
+import { InjectLogger } from '@libs/logger/decorators';
+import { Injectable } from '@nestjs/common';
 import { Transactional } from 'typeorm-transactional';
 import { Reservation } from '../models';
 import { ReservationFactory } from '../factories/reservation.factory';
@@ -13,8 +15,6 @@ import {
 import { ReservationProducer } from '../producers';
 import { OutboxAdapter } from '../adapters';
 import { ReservationReservedSeatEvent } from '../events';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { Logger } from 'winston';
 
 @Injectable()
 export class ReservationService {
@@ -26,7 +26,7 @@ export class ReservationService {
     private readonly seatRepository: SeatRepository,
     private readonly reservationProducer: ReservationProducer,
     private readonly outboxAdapter: OutboxAdapter,
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+    @InjectLogger() private readonly logger: LoggerService,
   ) {}
 
   @Transactional()
