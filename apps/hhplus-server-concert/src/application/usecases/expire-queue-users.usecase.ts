@@ -13,9 +13,8 @@ export class ExpireQueueUsersUseCase {
   async execute(): Promise<void> {
     const { count } = await this.queueService.expireQueueUsers();
 
-    this.logger.info(
-      `Expired queue users: ${count}`,
-      'ExpireQueueUsersUseCase',
-    );
+    this.logger.info('Expired queue users', 'ExpireQueueUsersUseCase', {
+      count,
+    });
   }
 }

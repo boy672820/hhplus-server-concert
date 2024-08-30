@@ -13,9 +13,8 @@ export class ActivateQueueUsersUseCase {
   async execute(): Promise<void> {
     const activeUsers = await this.queueService.activateQueueUsers();
 
-    this.logger.info(
-      `Activated queue users: ${activeUsers.length}`,
-      'ActivateQueueUsersUseCase',
-    );
+    this.logger.info('Activated queue users', 'ActivateQueueUsersUseCase', {
+      count: activeUsers.length,
+    });
   }
 }
