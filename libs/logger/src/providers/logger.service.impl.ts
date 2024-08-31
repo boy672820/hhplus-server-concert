@@ -18,21 +18,22 @@ export class LoggerServiceImpl implements LoggerService {
     serviceName?: string,
     errorOrMeta?: Error | Record<string, any>,
   ): void {
-    let meta: Error | Record<string, any>;
+    let data: Error | Record<string, any>;
 
     if (errorOrMeta instanceof Error) {
-      meta = {
+      data = {
         name: errorOrMeta.name,
         message: errorOrMeta.message,
         stack: errorOrMeta.stack,
       };
     } else {
-      meta = errorOrMeta || {};
+      data = errorOrMeta || {};
     }
 
-    this.logger.error(message, { ...meta, serviceName });
+    this.logger.error(message, { ...data, serviceName });
     this.opensearchService.index('log-errors', {
-      meta,
+      message,
+      data,
       serviceName,
       timestamp: LocalDateTime.now().toString(),
     });
@@ -41,12 +42,12 @@ export class LoggerServiceImpl implements LoggerService {
   warn(
     message: string,
     serviceName?: string,
-    meta?: Record<string, any>,
+    data?: Record<string, any>,
   ): void {
-    this.logger.warn(message, { meta, serviceName });
+    this.logger.warn(message, { data, serviceName });
     this.opensearchService.index('log-warnings', {
       message,
-      meta,
+      data,
       serviceName,
       timestamp: LocalDateTime.now().toString(),
     });
@@ -55,14 +56,12 @@ export class LoggerServiceImpl implements LoggerService {
   http(
     message: string,
     serviceName?: string,
-    meta?: Record<string, any>,
+    data?: Record<string, any>,
   ): void {
-    meta = meta || {};
-    Object.assign(meta, { serviceName });
-    this.logger.http(message, { serviceName });
+    this.logger.http(message, { data, serviceName });
     this.opensearchService.index('log-http', {
       message,
-      meta,
+      data,
       serviceName,
       timestamp: LocalDateTime.now().toString(),
     });
@@ -71,12 +70,12 @@ export class LoggerServiceImpl implements LoggerService {
   info(
     message: string,
     serviceName?: string,
-    meta?: Record<string, any>,
+    data?: Record<string, any>,
   ): void {
-    this.logger.info(message, { meta, serviceName });
+    this.logger.info(message, { data, serviceName });
     this.opensearchService.index('log-info', {
       message,
-      meta,
+      data,
       serviceName,
       timestamp: LocalDateTime.now().toString(),
     });
