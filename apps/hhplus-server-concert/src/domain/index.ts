@@ -8,6 +8,7 @@ import {
   SeatService,
 } from './services';
 import { ReservationFactory } from './factories/reservation.factory';
+import { SeatFactory } from './factories/seat.factory';
 
 export const services: Type<any>[] = [
   QueueService,
@@ -18,4 +19,4 @@ export const services: Type<any>[] = [
   PaymentService,
 ];
 
-export const factories: Type<any>[] = [ReservationFactory];
+export const factories: Type<any>[] = [ReservationFactory, SeatFactory];

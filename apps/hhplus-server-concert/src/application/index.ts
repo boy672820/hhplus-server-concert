@@ -13,10 +13,11 @@ import {
   ValidateQueueUseCase,
 } from './usecases';
 import { ReserveSeatHandler } from './commands/reserve-seat.handler';
-import { ReservationReservedSeatHandler } from './events/reservation-reserved-seat.handler';
+import { CancelReservationHandler } from './commands/cancel-reservation.handler';
+import { ReservationCreatedHandler } from './events/reservation-created.handler';
 import { ReservationCancelledHandler } from './events/reservation-cancelled.handler';
 import { ReservationPaidHandler } from './events/reservation-paid.handler';
-import { CancelReservationHandler } from './commands/cancel-reservation.handler';
+import { SeatReservedHandler } from './events/seat-reserved.handler';
 import { ReservationSagas } from './sagas/reservation.saga';
 
 export const usecases: Type<any>[] = [
@@ -39,9 +40,10 @@ export const commands: Type<any>[] = [
 ];
 
 export const events: Type<any>[] = [
-  ReservationReservedSeatHandler,
+  ReservationCreatedHandler,
   ReservationCancelledHandler,
   ReservationPaidHandler,
+  SeatReservedHandler,
 ];
 
 export const sagas: Type<any>[] = [ReservationSagas];

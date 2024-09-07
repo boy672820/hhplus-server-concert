@@ -6,7 +6,7 @@ interface Props {
 
 type EventPayload = Pick<Props, 'seatId' | 'reservationId'>;
 
-export class ReservationReservedSeatEvent implements Props {
+export class ReservationCreatedEvent implements Props {
   constructor(
     public readonly transactionId: string,
     public readonly seatId: string,

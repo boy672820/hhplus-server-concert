@@ -14,7 +14,7 @@ import {
 } from '../repositories';
 import { ReservationProducer } from '../producers';
 import { OutboxAdapter } from '../adapters';
-import { ReservationReservedSeatEvent } from '../events';
+import { ReservationCreatedEvent } from '../events';
 
 @Injectable()
 export class ReservationService {
@@ -77,13 +77,13 @@ export class ReservationService {
 
     const transaction = await this.outboxAdapter.publish(
       EventType.ReservationReservedSeat,
-      ReservationReservedSeatEvent.toPayload({
+      ReservationCreatedEvent.toPayload({
         reservationId: reservation.id,
         seatId: seat.id,
       }),
     );
 
-    reservation.reserveSeat({ seatId, transactionId: transaction.id });
+    reservation.create({ seatId, transactionId: transaction.id });
     reservation.commit();
 
     return reservation;

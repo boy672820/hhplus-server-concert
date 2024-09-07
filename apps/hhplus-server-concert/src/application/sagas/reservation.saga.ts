@@ -3,7 +3,7 @@ import { ofType, Saga } from '@nestjs/cqrs';
 import { map, Observable } from 'rxjs';
 import {
   ReservationCancelledEvent,
-  ReservationReservedSeatEvent,
+  ReservationCreatedEvent,
 } from '../../domain/events';
 import { CancelReservationCommand, ReserveSeatCommand } from '../commands';
 
@@ -12,7 +12,7 @@ export class ReservationSagas {
   @Saga()
   reservedSeat = (events$: Observable<any>): Observable<any> =>
     events$.pipe(
-      ofType(ReservationReservedSeatEvent),
+      ofType(ReservationCreatedEvent),
       map((event) => new ReserveSeatCommand(event.seatId, event.reservationId)),
     );
 

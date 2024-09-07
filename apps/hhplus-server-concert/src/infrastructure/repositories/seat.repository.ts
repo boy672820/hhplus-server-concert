@@ -9,11 +9,14 @@ import { SeatMapper } from '../mappers/seat.mapper';
 
 @Injectable()
 export class SeatRepositoryImpl implements SeatRepository {
-  constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
+  constructor(
+    @InjectDataSource() private readonly dataSource: DataSource,
+    private readonly seatMapper: SeatMapper,
+  ) {}
 
   async findById(id: string): Promise<Seat | null> {
     const entity = await this.dataSource.manager.findOneBy(SeatEntity, { id });
-    return entity ? SeatMapper.toModel(entity) : null;
+    return entity ? this.seatMapper.toModel(entity) : null;
   }
 
   async findAvailables(scheduleId: string): Promise<Seat[]> {
@@ -24,11 +27,11 @@ export class SeatRepositoryImpl implements SeatRepository {
         status: SeatStatus.Pending,
       },
     });
-    return entities.map(SeatMapper.toModel);
+    return entities.map(this.seatMapper.toModel);
   }
 
   async save(seat: Seat): Promise<void> {
-    const entity = SeatMapper.toEntity(seat);
+    const entity = this.seatMapper.toEntity(seat);
     await this.dataSource.manager.save(entity);
   }
 }

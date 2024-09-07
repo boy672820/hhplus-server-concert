@@ -1,29 +1,31 @@
 import { InjectLogger } from '@libs/logger/decorators';
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
 import { LoggerService } from '@libs/logger';
-import { ReservationReservedSeatEvent } from '../../domain/events';
+import { ReservationCreatedEvent } from '../../domain/events';
 import { ReservationService } from '../../domain/services';
 
-@EventsHandler(ReservationReservedSeatEvent)
-export class ReservationReservedSeatHandler
-  implements IEventHandler<ReservationReservedSeatEvent>
+@EventsHandler(ReservationCreatedEvent)
+export class ReservationCreatedHandler
+  implements IEventHandler<ReservationCreatedEvent>
 {
   constructor(
     @InjectLogger() private readonly logger: LoggerService,
     private readonly reservationService: ReservationService,
   ) {}
 
-  async handle(event: ReservationReservedSeatEvent) {
+  async handle(event: ReservationCreatedEvent) {
     const { transactionId, seatId, reservationId } = event;
+
+    this.logger.info('예약 생성됨', 'ReservationCreatedHandler', {
+      transactionId,
+      seatId,
+      reservationId,
+    });
 
     this.reservationService.emitReservedSeat({
       transactionId,
       seatId,
       reservationId,
     });
-
-    this.logger.info(
-      `[좌석 예약됨] 예약 ID: ${event.reservationId} / 좌석 ID: ${event.seatId}`,
-    );
   }
 }

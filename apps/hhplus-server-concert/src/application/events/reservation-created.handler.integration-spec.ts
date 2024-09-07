@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { Consumer, EachMessagePayload, Kafka } from 'kafkajs';
 import { randomBytes } from 'crypto';
-import { ReservationReservedSeatHandler } from './reservation-reserved-seat.handler';
+import { ReservationCreatedHandler } from './reservation-created.handler';
 import { TestCoreModule } from '../../core/test-core.module';
 import { ReservationService } from '../../domain/services';
 import { ReservationFactory } from '../../domain/factories/reservation.factory';
@@ -33,9 +33,9 @@ const waitForMessages = (buffer, { number = 1, delay = 50 } = {}) =>
 const secureRandom = (length = 10) =>
   `${randomBytes(length).toString('hex')}-${process.pid}-${ulid()}`;
 
-describe('ReservationReservedSeatHandler (Integration)', () => {
+describe('ReservationCreatedHandler (Integration)', () => {
   let app: INestApplication;
-  let reservationReservedSeatHandler: ReservationReservedSeatHandler;
+  let reservationReservedSeatHandler: ReservationCreatedHandler;
   let kafka: Kafka;
   let testConsumer: Consumer;
 
@@ -43,7 +43,7 @@ describe('ReservationReservedSeatHandler (Integration)', () => {
     const moduleRef = await Test.createTestingModule({
       imports: [TestCoreModule],
       providers: [
-        ReservationReservedSeatHandler,
+        ReservationCreatedHandler,
         ReservationService,
         ReservationFactory,
         {
@@ -74,9 +74,7 @@ describe('ReservationReservedSeatHandler (Integration)', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
-    reservationReservedSeatHandler = moduleRef.get(
-      ReservationReservedSeatHandler,
-    );
+    reservationReservedSeatHandler = moduleRef.get(ReservationCreatedHandler);
 
     await app.init();
 
