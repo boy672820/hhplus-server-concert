@@ -16,9 +16,10 @@ export class ReservationCancelledHandler
   async handle(event: ReservationCancelledEvent) {
     const { seatId, reservationId } = event;
 
-    this.logger.info(
-      `[예약 취소됨] 좌석 ID: ${seatId} / 예약 ID: ${reservationId}`,
-    );
+    this.logger.info('예약 취소됨', 'ReservationCancelledHandler', {
+      seatId,
+      reservationId,
+    });
 
     await this.mockApiService.send(reservationId, seatId);
   }
