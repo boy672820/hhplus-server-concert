@@ -1,4 +1,3 @@
-import { MockApiService } from '@libs/mock-api';
 import { InjectLogger } from '@libs/logger/decorators';
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
 import { LoggerService } from '@libs/logger';
@@ -8,18 +7,14 @@ import { ReservationPaidEvent } from '../../domain/events';
 export class ReservationPaidHandler
   implements IEventHandler<ReservationPaidEvent>
 {
-  constructor(
-    @InjectLogger() private readonly logger: LoggerService,
-    private readonly mockApiService: MockApiService,
-  ) {}
+  constructor(@InjectLogger() private readonly logger: LoggerService) {}
 
   async handle(event: ReservationPaidEvent) {
-    const { reservationId, seatId, amount } = event;
+    const { reservationId, seatId } = event;
 
-    this.logger.info(
-      `[예약 결제됨] 예약 ID: ${reservationId} / 좌석 ID: ${seatId} / 결제 금액: ${amount}`,
-    );
-
-    await this.mockApiService.send(reservationId, seatId, amount);
+    this.logger.info('예약 결제됨', 'ReservationPaidHandler', {
+      reservationId,
+      seatId,
+    });
   }
 }
