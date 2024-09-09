@@ -1,6 +1,11 @@
+import { Injectable } from '@nestjs/common';
 import { QueueUser } from '../../domain/models';
+import { QueueUserFactory } from '../../domain/factories';
 
+@Injectable()
 export class QueueUserMapper {
-  static createActive = (userId: string): QueueUser =>
-    QueueUser.createActive({ userId });
+  constructor(private readonly queueUserFactory: QueueUserFactory) {}
+
+  createActive = (userId: string): QueueUser =>
+    this.queueUserFactory.createActive({ userId });
 }

@@ -16,7 +16,7 @@ export class ReserveSeatHandler
     const { seatId, reservationId } = command;
 
     try {
-      await this.seatService.temporarilyReserve(seatId);
+      await this.seatService.temporarilyReserve(seatId, reservationId);
     } catch (e) {
       this.eventBus.publish(
         new ReservationCancelledEvent(seatId, reservationId),

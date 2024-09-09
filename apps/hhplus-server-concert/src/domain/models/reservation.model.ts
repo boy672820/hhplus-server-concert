@@ -3,7 +3,7 @@ import { DomainError } from '@libs/common/errors';
 import Decimal from 'decimal.js';
 import { ulid } from 'ulid';
 import { AggregateRoot } from '@nestjs/cqrs';
-import { ReservationPaidEvent, ReservationReservedSeatEvent } from '../events';
+import { ReservationPaidEvent, ReservationCreatedEvent } from '../events';
 
 export interface ReservationProps {
   id: string;
@@ -75,16 +75,14 @@ export class Reservation extends AggregateRoot implements ReservationProps {
   static from = (props: ReservationProps): Reservation =>
     new Reservation(props);
 
-  reserveSeat({
+  create({
     transactionId,
     seatId,
   }: {
     transactionId: string;
     seatId: string;
   }): void {
-    this.apply(
-      new ReservationReservedSeatEvent(transactionId, seatId, this.id),
-    );
+    this.apply(new ReservationCreatedEvent(transactionId, seatId, this.id));
   }
 
   pay(userId: string): void {

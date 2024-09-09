@@ -8,16 +8,21 @@ import { OptimisticLockVersionMismatchError } from 'typeorm';
 export class SeatService {
   constructor(private readonly seatRepository: SeatRepository) {}
 
-  async temporarilyReserve(seatId: string): Promise<Seat> {
+  async temporarilyReserve(
+    seatId: string,
+    reservationId: string,
+  ): Promise<Seat> {
     const seat = await this.seatRepository.findById(seatId);
 
     if (!seat) {
       throw DomainError.notFound('좌석을 찾을 수 없습니다.');
     }
 
-    seat.temporarilyReserve();
+    seat.temporarilyReserve(reservationId);
 
     await this.seatRepository.save(seat);
+
+    seat.commit();
 
     return seat;
   }

@@ -1,26 +1,20 @@
-import { MockApiService } from '@libs/mock-api';
-import { Inject } from '@nestjs/common';
+import { InjectLogger } from '@libs/logger/decorators';
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { Logger } from 'winston';
+import { LoggerService } from '@libs/logger';
 import { ReservationPaidEvent } from '../../domain/events';
 
 @EventsHandler(ReservationPaidEvent)
 export class ReservationPaidHandler
   implements IEventHandler<ReservationPaidEvent>
 {
-  constructor(
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
-    private readonly mockApiService: MockApiService,
-  ) {}
+  constructor(@InjectLogger() private readonly logger: LoggerService) {}
 
   async handle(event: ReservationPaidEvent) {
-    const { reservationId, seatId, amount } = event;
+    const { reservationId, seatId } = event;
 
-    this.logger.info(
-      `[예약 결제됨] 예약 ID: ${reservationId} / 좌석 ID: ${seatId} / 결제 금액: ${amount}`,
-    );
-
-    await this.mockApiService.send(reservationId, seatId, amount);
+    this.logger.info('예약 결제됨', 'ReservationPaidHandler', {
+      reservationId,
+      seatId,
+    });
   }
 }

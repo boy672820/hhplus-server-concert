@@ -11,7 +11,7 @@ export class RetriedTransactionHandler
 {
   constructor(
     private readonly outboxService: OutboxService,
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+    @InjectLogger() private readonly logger: LoggerService,
   ) {}
 
   handle(event: RetriedTransactionEvent) {

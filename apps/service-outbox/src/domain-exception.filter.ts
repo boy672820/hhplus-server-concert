@@ -6,7 +6,7 @@ import { Logger } from 'winston';
 @Catch(DomainError)
 export class DomainExceptionFilter implements ExceptionFilter {
   constructor(
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+    @InjectLogger() private readonly logger: LoggerService,
   ) {}
 
   catch(error: DomainError) {

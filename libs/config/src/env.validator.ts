@@ -25,6 +25,8 @@ export enum EnvKey {
 
   KAFKA_HOST = 'KAFKA_HOST',
   KAFKA_PORT = 'KAFKA_PORT',
+
+  OPENSEARCH_URL = 'OPENSEARCH_URL',
 }
 
 class EnviromentVariables {
@@ -62,6 +64,10 @@ class EnviromentVariables {
   KAFKA_HOST: string;
   @IsNumber()
   KAFKA_PORT: number;
+
+  @IsString()
+  @IsNotEmpty()
+  OPENSEARCH_URL: string;
 }
 
 export function validate(config: Record<string, unknown>) {

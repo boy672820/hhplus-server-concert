@@ -57,6 +57,7 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 # Docker Volume
 docker/*/data
+docker/*/opensearch-data1
 
 # K6 Load Testing
 k6/summary.json

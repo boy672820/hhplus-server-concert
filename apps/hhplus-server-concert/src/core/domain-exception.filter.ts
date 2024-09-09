@@ -1,13 +1,11 @@
 import { DomainError, DomainErrorCode } from '@libs/common/errors';
-import { ArgumentsHost, Catch, ExceptionFilter, Inject } from '@nestjs/common';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { Logger } from 'winston';
+import { InjectLogger } from '@libs/logger/decorators';
+import { LoggerService } from '@libs/logger';
+import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
 
 @Catch(DomainError)
 export class DomainExceptionFilter implements ExceptionFilter {
-  constructor(
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
-  ) {}
+  constructor(@InjectLogger() private readonly logger: LoggerService) {}
 
   catch(error: DomainError, host: ArgumentsHost) {
     const ctx = host.switchToHttp();

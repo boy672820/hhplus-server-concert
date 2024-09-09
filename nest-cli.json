@@ -126,6 +126,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/kafka-client/tsconfig.lib.json"
       }
+    },
+    "opensearch": {
+      "type": "library",
+      "root": "libs/opensearch",
+      "entryFile": "index",
+      "sourceRoot": "libs/opensearch/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/opensearch/tsconfig.lib.json"
+      }
     }
   }
 }

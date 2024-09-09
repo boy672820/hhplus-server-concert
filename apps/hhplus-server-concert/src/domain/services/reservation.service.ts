@@ -1,6 +1,8 @@
 import { EventType } from '@libs/domain/types';
 import { DomainError } from '@libs/common/errors';
-import { Inject, Injectable } from '@nestjs/common';
+import { LoggerService } from '@libs/logger';
+import { InjectLogger } from '@libs/logger/decorators';
+import { Injectable } from '@nestjs/common';
 import { Transactional } from 'typeorm-transactional';
 import { Reservation } from '../models';
 import { ReservationFactory } from '../factories/reservation.factory';
@@ -12,9 +14,7 @@ import {
 } from '../repositories';
 import { ReservationProducer } from '../producers';
 import { OutboxAdapter } from '../adapters';
-import { ReservationReservedSeatEvent } from '../events';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { Logger } from 'winston';
+import { ReservationCreatedEvent } from '../events';
 
 @Injectable()
 export class ReservationService {
@@ -26,7 +26,7 @@ export class ReservationService {
     private readonly seatRepository: SeatRepository,
     private readonly reservationProducer: ReservationProducer,
     private readonly outboxAdapter: OutboxAdapter,
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+    @InjectLogger() private readonly logger: LoggerService,
   ) {}
 
   @Transactional()
@@ -37,64 +37,56 @@ export class ReservationService {
     userId: string;
     seatId: string;
   }): Promise<Reservation> {
-    try {
-      const seat = await this.seatRepository.findById(seatId);
+    const seat = await this.seatRepository.findById(seatId);
 
-      if (!seat) {
-        throw DomainError.notFound('좌석을 찾을 수 없습니다.');
-      }
-
-      if (seat.isNotAvailable()) {
-        throw DomainError.conflict('이미 예약된 좌석입니다.');
-      }
-
-      const event = await this.eventRepository.findById(seat.eventId);
-
-      if (!event) {
-        throw DomainError.notFound('이벤트를 찾을 수 없습니다.');
-      }
-
-      const schedule = await this.scheduleRepository.findById(seat.scheduleId);
-
-      if (!schedule) {
-        throw DomainError.notFound('스케줄을 찾을 수 없습니다.');
-      }
-
-      const reservation = this.reservationFactory.create({
-        userId,
-        seatId,
-        seatNumber: seat.number,
-        price: seat.price,
-        eventId: seat.eventId,
-        eventTitle: event.title,
-        eventAddress: event.address,
-        eventStartDate: event.startDate,
-        eventEndDate: event.endDate,
-        scheduleStartDate: schedule.startDate,
-        scheduleEndDate: schedule.endDate,
-      });
-
-      await this.reservationRepository.save(reservation);
-
-      const transaction = await this.outboxAdapter.publish(
-        EventType.ReservationReservedSeat,
-        ReservationReservedSeatEvent.toPayload({
-          reservationId: reservation.id,
-          seatId: seat.id,
-        }),
-      );
-
-      reservation.reserveSeat({ seatId, transactionId: transaction.id });
-      reservation.commit();
-
-      return reservation;
-    } catch (e) {
-      this.logger.error(
-        `[예약 생성 실패] 예약정보: ${JSON.stringify({ userId, seatId })}`,
-        e,
-      );
-      throw e;
+    if (!seat) {
+      throw DomainError.notFound('좌석을 찾을 수 없습니다.');
     }
+
+    if (seat.isNotAvailable()) {
+      throw DomainError.conflict('이미 예약된 좌석입니다.');
+    }
+
+    const event = await this.eventRepository.findById(seat.eventId);
+
+    if (!event) {
+      throw DomainError.notFound('이벤트를 찾을 수 없습니다.');
+    }
+
+    const schedule = await this.scheduleRepository.findById(seat.scheduleId);
+
+    if (!schedule) {
+      throw DomainError.notFound('스케줄을 찾을 수 없습니다.');
+    }
+
+    const reservation = this.reservationFactory.create({
+      userId,
+      seatId,
+      seatNumber: seat.number,
+      price: seat.price,
+      eventId: seat.eventId,
+      eventTitle: event.title,
+      eventAddress: event.address,
+      eventStartDate: event.startDate,
+      eventEndDate: event.endDate,
+      scheduleStartDate: schedule.startDate,
+      scheduleEndDate: schedule.endDate,
+    });
+
+    await this.reservationRepository.save(reservation);
+
+    const transaction = await this.outboxAdapter.publish(
+      EventType.ReservationReservedSeat,
+      ReservationCreatedEvent.toPayload({
+        reservationId: reservation.id,
+        seatId: seat.id,
+      }),
+    );
+
+    reservation.create({ seatId, transactionId: transaction.id });
+    reservation.commit();
+
+    return reservation;
   }
 
   async pay({

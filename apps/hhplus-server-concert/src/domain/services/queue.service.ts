@@ -39,6 +39,9 @@ export class QueueService {
     if (!user) {
       throw DomainError.notFound('사용자를 찾을 수 없습니다.');
     }
+
+    user.expire();
+    user.commit();
   }
 
   async activateQueueUsers(): Promise<QueueUser[]> {

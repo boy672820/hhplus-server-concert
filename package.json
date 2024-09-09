@@ -43,6 +43,7 @@
     "@nestjs/schedule": "^4.1.0",
     "@nestjs/swagger": "^7.4.0",
     "@nestjs/typeorm": "^10.0.2",
+    "@opensearch-project/opensearch": "^3.0.0-beta.5",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "decimal.js": "^10.4.3",
@@ -115,7 +116,8 @@
       "^@libs/redis(|/.*)$": "<rootDir>/libs/redis/src/$1",
       "^@libs/outbox(|/.*)$": "<rootDir>/libs/outbox/src/$1",
       "^@libs/logger(|/.*)$": "<rootDir>/libs/logger/src/$1",
-      "^@libs/kafka-client(|/.*)$": "<rootDir>/libs/kafka-client/src/$1"
+      "^@libs/kafka-client(|/.*)$": "<rootDir>/libs/kafka-client/src/$1",
+      "^@libs/opensearch(|/.*)$": "<rootDir>/libs/opensearch/src/$1"
     },
     "roots": [
       "<rootDir>/apps/",
