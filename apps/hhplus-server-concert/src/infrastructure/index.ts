@@ -21,6 +21,7 @@ import { OutboxAdapter } from '../domain/adapters';
 import { OutboxAdapterImpl } from './adapters/outbox.adapter';
 import { ReservationMapper } from './mappers/reservation.mapper';
 import { SeatMapper } from './mappers/seat.mapper';
+import { QueueUserMapper } from './mappers/queue-user.mapper';
 
 export const repositories: Provider[] = [
   {
@@ -60,7 +61,11 @@ export const producers: Provider[] = [
   },
 ];
 
-export const mappers: Provider[] = [ReservationMapper, SeatMapper];
+export const mappers: Provider[] = [
+  ReservationMapper,
+  SeatMapper,
+  QueueUserMapper,
+];
 
 export const adapters: Provider[] = [
   {

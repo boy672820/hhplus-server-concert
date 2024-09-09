@@ -7,7 +7,10 @@ import { QueueUserMapper } from '../mappers/queue-user.mapper';
 
 @Injectable()
 export class QueueRepositoryImpl implements QueueRepository {
-  constructor(@InjectRedis() private readonly redis: Redis) {}
+  constructor(
+    @InjectRedis() private readonly redis: Redis,
+    private readonly queueUserMapper: QueueUserMapper,
+  ) {}
 
   async enqueue(queueUser: QueueUser): Promise<void> {
     await this.redis.zadd(
@@ -35,7 +38,7 @@ export class QueueRepositoryImpl implements QueueRepository {
     }
 
     return (members as string[]).map((userId) =>
-      QueueUserMapper.createActive(userId),
+      this.queueUserMapper.createActive(userId),
     );
   }
 
@@ -66,7 +69,7 @@ export class QueueRepositoryImpl implements QueueRepository {
       return null;
     }
 
-    return QueueUserMapper.createActive(userId);
+    return this.queueUserMapper.createActive(userId);
   }
 
   async dequeueActive(userId: string): Promise<QueueUser | null> {
@@ -76,6 +79,6 @@ export class QueueRepositoryImpl implements QueueRepository {
       return null;
     }
 
-    return QueueUserMapper.createActive(userId);
+    return this.queueUserMapper.createActive(userId);
   }
 }
