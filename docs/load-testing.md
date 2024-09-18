@@ -157,9 +157,9 @@
 
 OpenSearch & Prometheus를 이용하여 로깅과 모니터링을 구축하였습니다.
 
-![](./grafana-visualization.png)
+### [2.1] Logging (feat. OpenSearch)
 
-### [1.1] Logging (feat. OpenSearch)
+![](./opensearch-dashboard.png)
 
 서버 애플리케이션의 로그는 OpenSearch에 기록되며, 5단계로 나뉩니다:
 
@@ -264,6 +264,15 @@ export class ReservationCreatedHandler
   }
 }
 ```
+
+### [2.2] Prometheus 모니터링 시스템
+
+Prometheus를 통한 서버 애플리케이션의 모니터링을 진행합니다.
+
+Prometheus 모니터링에 대한 정보를 쉽게 확인해볼 수 있도록 Grafana Visualization을 적용하였습니다.
+
+![](./grafana-visualization.png)
+
 
 <br />
 <br />
