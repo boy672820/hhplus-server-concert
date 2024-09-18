@@ -7,6 +7,7 @@ import {
   OpenSearchConfigService,
 } from '@libs/config/opensearch';
 import { DatabaseModule } from '@libs/database';
+import { PrometheusModule } from '@libs/prometheus';
 import { LoggerModule } from '@libs/logger';
 import { OutboxModule } from '@libs/outbox';
 import { RedisModule } from '@libs/redis';
@@ -28,6 +29,7 @@ import { LoggingInterceptor } from './logging.interceptor';
     DatabaseModule,
     RedlockModule,
     MockApiModule,
+    PrometheusModule.register(),
     LoggerModule.forRootAsync({
       global: true,
       imports: [OpenSearchConfigModule, AppConfigModule],
