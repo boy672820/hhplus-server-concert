@@ -1,0 +1,6 @@
+services:
+  grafana:
+    image: grafana/grafana-enterprise
+    container_name: grafana
+    ports:
+      - '3030:3000'
