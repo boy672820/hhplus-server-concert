@@ -4,9 +4,10 @@
 
 ## 목차
 
-1. 시나리오와 워크로드 모델링
-2. 테스트 결과 분석
-3. 문제점 개선
+1. [시나리오와 워크로드 모델링](#1-시나리오와-워크로드-모델링)
+2. 모니터링 시스템 구축
+3. [테스트 결과 분석](#3-테스트-결과-분석)
+4. [문제점 개선](#4-문제점-개선)
 
 <br />
 
@@ -152,11 +153,130 @@
 
 <br />
 
-## 2. 테스트 결과 분석
+## 2. 모니터링 시스템 구축
+
+OpenSearch & Prometheus를 이용하여 로깅과 모니터링을 구축하였습니다.
+
+![](./grafana-visualization.png)
+
+### [1.1] Logging (feat. OpenSearch)
+
+서버 애플리케이션의 로그는 OpenSearch에 기록되며, 5단계로 나뉩니다:
+
+1. `error`: 의도된 예외 처리(HTTP 401, 403, 409, 422) 또는 예기치 못한 런타임 에러에 대한 기록
+2. `warn`: 전체 시스템에 부하가 많아져 주의가 필요하거나 비정상적인 요청이 감지될 기록
+3. `http`: 모든 HTTP 요청과 응답에 대해 기록
+4. `info`: 데이터 수집 및 분석 목적의 시스템 로그
+5. `debug`: 개발 모드에서만 사용되는 로그
+
+Product 환경에서는 `error`, `warn`, `http`, `info` 단계만을 로깅하고 있습니다.
+
+#### (1) 에러 로깅
+
+에러는 의도된 HTTP 40x 예외 처리 또는 의도치 않은 런타임 에러일 수 있습니다. 이 경우, LoggingInterceptor가 에러를 캐치하여 URL, HTTP 메서드, 헤더, 바디, 쿼리, 파라미터, 지연 시간, 에러 추적 정보를 로그로 남깁니다.
+
+```typescript
+@Injectable()
+export class LoggingInterceptor implements NestInterceptor {
+  constructor(@InjectLogger() private readonly logger: LoggerService) {}
+
+  intercept(context, next) {
+    const request = context.switchToHttp().getRequest();
+
+    return next.handle().pipe(
+      catchError((_error) => {
+        const response = context.switchToHttp().getResponse();
+
+        const error: Error | unknown =
+          _error instanceof Error
+            ? {
+                name: _error.name,
+                message: _error.message,
+                stack: _error.stack,
+              }
+            : _error || {};
+
+        this.logger.error('Request error', 'LoggingInterceptor', {
+          url: request.url,
+          method: request.method,
+          headers: request.headers,
+          body: request.body,
+          query: request.query,
+          params: request.params,
+          status: response.statusCode,
+          delay,
+          error,
+        });
+
+        return throwError(() => error);
+      }),
+    );
+  }
+}
+```
+
+### (2) 주요 비즈니스 로직에 대한 로깅
+
+로깅은 여러가지 측면에서 유용할 수 있습니다. 예를 들어, 주요 비즈니스 로직에서 정보를 수집할 목적으로 로깅을 사용할 수 있습니다.
+
+콘서트 예약 서비스의 경우에도 주요 비즈니스 로직인 '좌석 예약', '결제' 유즈케이스에 로깅이 적용되어 있습니다.
+
+좌석 예약 시, 좌석 임시 할당 정보와 예약 내역 생성이 정상적으로 처리되었는지 로깅을 통해 확인할 수 있습니다. 시스템 오류가 발생할 경우, 남겨진 로그는 디버깅 과정에서 버그를 추적하는 데 중요한 단서를 제공합니다.
+
+좌석 예약 이벤트가 발행되면, 이벤트 핸들러에서 좌석 예약에 대한 로깅을 처리하고 있습니다.
+
+```typescript
+@EventsHandler(SeatReservedEvent)
+export class SeatReservedHandler implements IEventHandler<SeatReservedEvent> {
+  constructor(@InjectLogger() private readonly logger: LoggerService) {}
+
+  async handle(event: SeatReservedEvent) {
+    const { seatId, reservationId } = event;
+
+    this.logger.info('좌석 예약됨', 'SeatReservedHandler', {
+      seatId,
+      reservationId,
+    });
+  }
+}
+```
+
+마찬가지로, 예약 정보가 생성되면 이벤트를 발행해 핸들러에서 로깅을 처리합니다.
+
+```typescript
+@EventsHandler(ReservationCreatedEvent)
+export class ReservationCreatedHandler
+  implements IEventHandler<ReservationCreatedEvent>
+{
+  constructor(
+    @InjectLogger() private readonly logger: LoggerService,
+    private readonly reservationService: ReservationService,
+  ) {}
+
+  async handle(event: ReservationCreatedEvent) {
+    const { transactionId, seatId, reservationId } = event;
+
+    this.logger.info('예약 생성됨', 'ReservationCreatedHandler', {
+      transactionId,
+      seatId,
+      reservationId,
+    });
+  }
+}
+```
+
+<br />
+<br />
+
+---
+
+<br />
+
+## 3. 테스트 결과 분석
 
 가설을 세운 워크로드를 기반으로, 테스트를 실시한 후 결과를 분석합니다.
 
-### [2.1] 부하 테스트 결과
+### [3.1] 부하 테스트 결과
 
 - _테스트 진행 시간: 30s_
 - _전체 요청 수: 7,408_
@@ -319,7 +439,7 @@
 
 <br />
 
-### [2.2] 테스트 결과 분석
+### [3.2] 테스트 결과 분석
 
 ```
 →  ✗ http_req_failed......................: 19.94% ✓ 1314       ✗ 5275
@@ -364,11 +484,11 @@ Internal Server Error가 발생하는 지점은 Redlock 로직이 적용된 '예
 
 <br />
 
-## 3. 문제점 개선
+## 4. 문제점 개선
 
 분석 결과를 토대로 문제점들을 개선하여 버그를 수정하고, 성능적으로 얼마나 개선되었는지 확인해보겠습니다.
 
-### [3.1] 개선 방안
+### [4.1] 개선 방안
 
 문제가 되었던 '예약 결제'는 두 가지 Lock 경합이 발생합니다.
 
@@ -458,7 +578,7 @@ export class RedlockService {
 }
 ```
 
-### [3.2] 개선 후 성능
+### [4.2] 개선 후 성능
 
 - TPS가 ~~14~~에서 21로 +7 TPS 개선 됨
 - 응답 시간은 4.6s로 -1.3s 개선 됨
