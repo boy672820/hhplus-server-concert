@@ -3,21 +3,24 @@ build-local: ## Build the local docker image.
 	docker compose --env-file .env -f docker/local/docker-compose.yml \
 		-f docker/local/docker-compose.kafka.yml \
 		-f docker/local/docker-compose.opensearch.yml \
-		-f docker/local/docker-compose.prometheus.yml build
+		-f docker/local/docker-compose.prometheus.yml \
+		-f docker/local/docker-compose.grafana.yml build
 
 .PHONY: start-local
 start-local: ## Start the local docker container.
 	docker compose --env-file .env -f docker/local/docker-compose.yml \
 		-f docker/local/docker-compose.kafka.yml \
 		-f docker/local/docker-compose.opensearch.yml \
-		-f docker/local/docker-compose.prometheus.yml up -d
+		-f docker/local/docker-compose.prometheus.yml \
+		-f docker/local/docker-compose.grafana.yml up -d
 
 .PHONY: stop-local
 stop-local: ## Stop the local docker container.
 	docker compose --env-file .env -f docker/local/docker-compose.yml \
 		-f docker/local/docker-compose.kafka.yml \
 		-f docker/local/docker-compose.opensearch.yml \
-		-f docker/local/docker-compose.prometheus.yml down
+		-f docker/local/docker-compose.prometheus.yml \
+		-f docker/local/docker-compose.grafana.yml down
 
 .PHONY: build-test
 build-test: ## Build the test docker image.
