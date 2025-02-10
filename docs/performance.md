@@ -40,7 +40,7 @@
 ```mermaid
 flowchart LR
 
-targets[1. 테스트 항목]-->conditions[2. 테스트 조건]-->scenarios[3. 테스트 시나리오]-->checks[4. 점검 항목]
+targets[테스트 항목]-->conditions[테스트 조건]-->scenarios[테스트 시나리오]-->checks[점검 항목]
 ```
 
 #### (1) 테스트 항목
@@ -285,7 +285,7 @@ DB의 높은 디스크 읽기/쓰기와 네트워크 입출력은 상당한 부�
 ```mermaid
 flowchart TD
 
-1[1. SELECT status FROM seats WHERE id = ?]-->2[2. UPDATE seats SET status = 'RESERVED' WHERE id = ?]-->3[3. INSERT INTO reservations ..]
+1[SELECT status FROM seats WHERE id = ?]-->2[UPDATE seats SET status = 'RESERVED' WHERE id = ?]-->3[INSERT INTO reservations ..]
 ```
 
 예를 들어, 1분만에 1,000개의 좌석이 전부 소진된다면 어떻게 될까요? 한 번의 예약을 위해 3번의 쿼리가 실행되어야 합니다. 1분만에 1000건의 예약이 진행된다면 3,000번의 쿼리가 실행되어야 합니다.
@@ -297,7 +297,7 @@ flowchart TD
 ```mermaid
 flowchart TD
 
-1[1. INSERT INTO queue_tokens ..]-->2[SELECT status FROM queue_tokens WHERE user_id = ?]
+1[INSERT INTO queue_tokens ..]-->2[SELECT status FROM queue_tokens WHERE user_id = ?]
 ```
 
 만약 좌석 예약이 대기열 입장을 통해 진행된다고 가정해 보겠습니다. 한 번에 입장 가능한 인원이 10명이고 좌석 예약을 하는데 걸리는 시간이 1분이라면, 대기열을 통해 순서대로 입장시켜 100분의 시간에 걸처 1,000개의 좌석을 모두 예약할 수 있습니다. 따라서, 단 시간에 발생하는 대량의 트래픽을 긴 시간에 걸쳐 처리할 수 있습니다.
@@ -331,7 +331,7 @@ u->>+q: 3초마다 수행..
 ```mermaid
 flowchart TD
 
-1[1. INSERT INTO queue_tokens ..]--입장 가능 여부 조회-->2[2. SELECT status FROM queue_tokens WHERE user_id = ?]--입장 성공 & 좌석 예약-->3[3. SELECT status FROM seats WHERE id = ?]-->4[4. UPDATE seats SET status = 'RESERVED' WHERE id = ?]-->5[5. INSERT INTO reservations ..]--예약 성공 후 토큰 만료처리-->6[6. DELETE FROM queue_tokens WHERE user_id ?]
+1[INSERT INTO queue_tokens ..]--입장 가능 여부 조회-->2[SELECT status FROM queue_tokens WHERE user_id = ?]--입장 성공 & 좌석 예약-->3[SELECT status FROM seats WHERE id = ?]-->4[UPDATE seats SET status = 'RESERVED' WHERE id = ?]-->5[INSERT INTO reservations ..]--예약 성공 후 토큰 만료처리-->6[DELETE FROM queue_tokens WHERE user_id ?]
 ```
 
 > 대기열 토큰 발행 후 좌석 예약이 진행되며, 예약이 완료되면 토큰을 만료시켜야 합니다. 따라서 좌석 예약 + 대기열에 대한 쿼리까지 추가적으로 수행되어야 합니다.
